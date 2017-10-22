@@ -163,25 +163,25 @@ namespace BuildCast.Services
                 if (titleBar != null)
                 {
                     titleBar.ButtonBackgroundColor = Colors.Transparent;
-                    if (TrueTheme() == ElementTheme.Dark)
-                    {
-                        titleBar.ButtonForegroundColor = Colors.White;
-                        titleBar.ForegroundColor = Colors.White;
-                    }
-                    else
-                    {
-                        titleBar.ButtonForegroundColor = Colors.Black;
-                        titleBar.ForegroundColor = Colors.Black;
-                    }
+                    //if (TrueTheme() == ElementTheme.Dark)
+                    //{
+                    //    titleBar.ButtonForegroundColor = Colors.White;
+                    //    titleBar.ForegroundColor = Colors.White;
+                    //}
+                    //else
+                    //{
+                    //    titleBar.ButtonForegroundColor = Colors.Black;
+                    //    titleBar.ForegroundColor = Colors.Black;
+                    //}
 
-                    titleBar.BackgroundColor = Colors.Black;
+                    //titleBar.BackgroundColor = Colors.Black;
 
                     titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
                     titleBar.ButtonInactiveForegroundColor = Colors.LightGray;
 
                     CoreApplicationViewTitleBar coreTitleBar = TitleBarHelper.Instance.TitleBar;
 
-                    coreTitleBar.ExtendViewIntoTitleBar = true;
+                    coreTitleBar.ExtendViewIntoTitleBar = false;
                 }
             }
         }
