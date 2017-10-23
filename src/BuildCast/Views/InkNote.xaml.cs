@@ -103,20 +103,6 @@ namespace BuildCast.Views
                         AddHeart(drawing);
                         RemoveInkStrokes(drawing);
                     }
-                    else if (drawing.DrawingKind == InkAnalysisDrawingKind.Triangle || drawing.DrawingKind == InkAnalysisDrawingKind.EquilateralTriangle)
-                    {
-                        if (string.IsNullOrEmpty(customEmojiGlyph))
-                        {
-                            await PickEmoji();
-                        }
-
-                        if (!string.IsNullOrEmpty(customEmojiGlyph))
-                        {
-                            AddEmoji(drawing, customEmojiGlyph);
-                        }
-
-                        RemoveInkStrokes(drawing);
-                    }
                 }
 
                 _inkAnalyzer.ClearDataForAllStrokes();
