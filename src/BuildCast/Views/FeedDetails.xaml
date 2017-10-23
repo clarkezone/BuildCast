@@ -35,7 +35,7 @@
             
             <DataTemplate x:Key="itemTemplate" x:DataType="datamodel:Episode">
 
-                <SwipeControl x:Name="swipeContainer">
+                <!--<SwipeControl x:Name="swipeContainer">
                     
                     <SwipeControl.RightItems>
                         <SwipeItems Mode="Reveal">
@@ -50,7 +50,7 @@
                                 </SwipeItem.IconSource>
                             </SwipeItem>
                         </SwipeItems>
-                    </SwipeControl.RightItems>
+                    </SwipeControl.RightItems>-->
                     
                     <Grid Height="90" x:Name="RootGrid" Margin="12,0,12,0">
                         <Grid.Resources>
@@ -108,7 +108,7 @@
                             </Button>
                         </StackPanel>
                     </Grid>
-                </SwipeControl>
+                <!--</SwipeControl>-->
             </DataTemplate>
             
             <DataTemplate x:Key="GriditemTemplate" x:DataType="datamodel:Episode">

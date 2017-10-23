@@ -267,7 +267,7 @@ namespace BuildCast.Views
         {
             Episode detailsItem = e.ClickedItem as Episode;
 
-            StartConnectedItemImage(detailsItem);
+            //StartConnectedItemImage(detailsItem);
 
             ViewModel.GoToEpisodeDetails(detailsItem);
         }
