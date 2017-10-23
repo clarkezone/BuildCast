@@ -34,6 +34,8 @@ namespace BuildCast.Views
             _instance = this;
             this.InitializeComponent();
 
+            windowTitle.EnableLayoutImplicitAnimations(TimeSpan.FromMilliseconds(100));
+
             var nav = SystemNavigationManager.GetForCurrentView();
 
             nav.BackRequested += Nav_BackRequested;
