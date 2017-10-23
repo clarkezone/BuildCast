@@ -60,5 +60,6 @@
             <Frame x:Name="appNavFrame" Navigated="AppNavFrame_Navigated">
             </Frame>
         </RS3:NavigationView>
+        <TextBlock x:Name="windowTitle" Style="{ThemeResource CaptionTextBlockStyle}" Visibility="{x:Bind TitleHelper.TitleVisibility, Mode=OneWay}" Margin="{x:Bind TitleHelper.TitlePosition, Mode=OneWay}" VerticalAlignment="Top" Text="{x:Bind appmodel:Package.Current.DisplayName}"></TextBlock>
     </Grid>
 </Page>
