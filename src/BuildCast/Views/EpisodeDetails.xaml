@@ -43,7 +43,7 @@
                     <BitmapImage UriSource="{x:Bind ViewModel.CurrentEpisode.Feed.ImageUri}" />
                 </Image.Source>
             </Image>
-            <Rectangle Fill="{StaticResource InApp}" Grid.ColumnSpan="2" />
+            <Rectangle Fill="{ThemeResource SystemAccentColor}" Grid.ColumnSpan="2" />
 
             <Image x:Name="feedItemImage" Height="300" Margin="25,75,24,40" 
                    VerticalAlignment="Top" 

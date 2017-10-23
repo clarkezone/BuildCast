@@ -37,7 +37,6 @@ namespace BuildCast.Views
         public FeedDetails()
         {
             this.InitializeComponent();
-            ConfigureAnimations();
 
             // Customize sizing for Xbox
             if (AnalyticsInfo.VersionInfo.DeviceFamily == "Windows.Xbox")
@@ -111,13 +110,6 @@ namespace BuildCast.Views
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             base.OnNavigatingFrom(e);
-
-            // TODO: check if we're going back to player only do reverse then
-            if (e.NavigationMode == NavigationMode.Back)
-            {
-                var cas = ConnectedAnimationService.GetForCurrentView();
-                cas.PrepareToAnimate("podimageback", podimage);
-            }
         }
 
         private void Feeditems_ChoosingItemContainer(ListViewBase sender, ChoosingItemContainerEventArgs args)
@@ -130,9 +122,6 @@ namespace BuildCast.Views
 
             // Otherwise, we need to make a new container. Wire up the events on the container, and set it as the ItemContainer.
             ListViewItem containerItem = new ListViewItem();
-
-            // Wire up stagger animations on items
-            containerItem.Loaded += ContainerItem_Loaded;
 
             // Show hover buttons
             containerItem.PointerEntered += ContainerItem_PointerEntered;
@@ -266,8 +255,6 @@ namespace BuildCast.Views
         private void Feeditems_ItemClick(object sender, ItemClickEventArgs e)
         {
             Episode detailsItem = e.ClickedItem as Episode;
-
-            StartConnectedItemImage(detailsItem);
 
             ViewModel.GoToEpisodeDetails(detailsItem);
         }

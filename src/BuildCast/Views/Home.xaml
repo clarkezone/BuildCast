@@ -61,16 +61,14 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="310"></RowDefinition>
         </Grid.RowDefinitions>
-        <ParallaxView x:Name="paraimage" Grid.Row="0" HorizontalShift="400" Source="{x:Bind HomeFeedGrid}" VerticalAlignment="Bottom" Margin="0,-228,0,0">
-            <Image 
+        <Image 
                    Margin="-0,0,0,0"
                    Stretch="UniformToFill"
                    MinHeight="690">
-                <Image.Source>
-                    <BitmapImage UriSource="{x:Bind ParallaxImage}" />
-                </Image.Source>
-            </Image>
-        </ParallaxView>
+            <Image.Source>
+                <BitmapImage UriSource="{x:Bind ParallaxImage}" />
+            </Image.Source>
+        </Image>
 
         <Image x:Name="Logo" 
                VerticalAlignment="Top" 
