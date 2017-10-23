@@ -29,8 +29,36 @@
         <Rectangle x:Name="BorderRect" x:Load="False" 
                    Fill="{StaticResource NavigationViewDefaultPaneBackground}" 
                    HorizontalAlignment="Left" Height="1000" Width="48"/>
-      
+        <RS3:NavigationView IsSettingsVisible="True" x:Name="navview" AlwaysShowHeader="False" ItemInvoked="Navview_ItemInvoked">
+            <RS3:NavigationView.MenuItems>
+                <RS3:NavigationViewItem Content="Browse videos" IsSelected="True">
+                    <RS3:NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE720;" ></FontIcon>
+                    </RS3:NavigationViewItem.Icon>
+                </RS3:NavigationViewItem>
+                <RS3:NavigationViewItem Content="Now playing" >
+                    <RS3:NavigationViewItem.Icon>
+                        <FontIcon FontFamily="/Assets/BCastMDL2.ttf#BuildCast MDL2 Assets" Glyph="&#xE93D;"/>
+                    </RS3:NavigationViewItem.Icon>
+                </RS3:NavigationViewItem>
+                <RS3:NavigationViewItem Content="Favorites" >
+                    <RS3:NavigationViewItem.Icon>
+                        <FontIcon x:Name="FavoriteStaticIcon" FontFamily="Segoe MDL2 Assets" Glyph="&#xE728;" ></FontIcon>
+                    </RS3:NavigationViewItem.Icon>
+                </RS3:NavigationViewItem>
+                <RS3:NavigationViewItem Content="Notes" >
+                    <RS3:NavigationViewItem.Icon>
+                        <FontIcon x:Name="NoteStaticIcon" FontFamily="/Assets/BCastMDL2.ttf#BuildCast MDL2 Assets" Glyph="&#xECFC;" ></FontIcon>
+                    </RS3:NavigationViewItem.Icon>
+                </RS3:NavigationViewItem>
+                <RS3:NavigationViewItem Content="Downloads" >
+                    <RS3:NavigationViewItem.Icon>
+                        <FontIcon x:Name="DoanlodsStaticIcon" FontFamily="Segoe MDL2 Assets" Glyph="&#xE896;" ></FontIcon>
+                    </RS3:NavigationViewItem.Icon>
+                </RS3:NavigationViewItem>
+            </RS3:NavigationView.MenuItems>
             <Frame x:Name="appNavFrame" Navigated="AppNavFrame_Navigated">
             </Frame>
+        </RS3:NavigationView>
     </Grid>
 </Page>

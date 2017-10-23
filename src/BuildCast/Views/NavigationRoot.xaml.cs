@@ -112,7 +112,24 @@ namespace BuildCast.Views
 
         private void AppNavFrame_Navigated(object sender, NavigationEventArgs e)
         {
-           
+            switch (e.SourcePageType)
+            {
+                case Type c when e.SourcePageType == typeof(Home):
+                    ((NavigationViewItem)navview.MenuItems[0]).IsSelected = true;
+                    break;
+                case Type c when e.SourcePageType == typeof(Player):
+                    ((NavigationViewItem)navview.MenuItems[1]).IsSelected = true;
+                    break;
+                case Type c when e.SourcePageType == typeof(Favorites):
+                    ((NavigationViewItem)navview.MenuItems[2]).IsSelected = true;
+                    break;
+                case Type c when e.SourcePageType == typeof(Notes):
+                    ((NavigationViewItem)navview.MenuItems[3]).IsSelected = true;
+                    break;
+                case Type c when e.SourcePageType == typeof(Downloads):
+                    ((NavigationViewItem)navview.MenuItems[4]).IsSelected = true;
+                    break;
+            }
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -125,6 +142,8 @@ namespace BuildCast.Views
                 _navigationService.NavigateToPodcastsAsync();
                 hasLoadedPreviously = true;
             }
+
+            ViewModeService.Instance.Register(navview, appNavFrame);
 
             if (AnalyticsInfo.VersionInfo.DeviceFamily == "Windows.Xbox")
             {
