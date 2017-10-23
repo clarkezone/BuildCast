@@ -34,63 +34,79 @@
         <RelativePanel.Resources>
 
             <DataTemplate x:Key="itemTemplate" x:DataType="datamodel:Episode">
+                <SwipeControl x:Name="swipeContainer">
 
-                <Grid Height="90" x:Name="RootGrid" Margin="12,0,12,0">
-                    <Grid.Resources>
-                        <Thickness x:Key="IconButtonMargin">2,0,0,0</Thickness>
-                    </Grid.Resources>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="128" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Image x:Name="itemImage" Width="128" Height="72">
-                        <Image.Source>
-                            <BitmapImage UriSource="{x:Bind ItemThumbnail}" />
-                        </Image.Source>
-                    </Image>
-                    <StackPanel Margin="14,0,0,0" Grid.Column="1" VerticalAlignment="Center" >
-                        <TextBlock FontWeight="Bold" x:Name="itemTitle"  Text="{x:Bind Title}" TextWrapping="Wrap" />
-                        <TextBlock x:Name="itemsubTitle"  Text="{x:Bind Subtitle}" TextWrapping="NoWrap" />
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock x:Name="itemspublishdate" Text="{x:Bind localfunc:NavigationRoot.ShortDate(PublishDate.Date)}" TextWrapping="NoWrap" />
-                            <TextBlock x:Name="itemspublishdata" Margin="16,0,0,0" Text="{x:Bind Duration}" TextWrapping="NoWrap" />
+                    <SwipeControl.RightItems>
+                        <SwipeItems Mode="Reveal">
+                            <SwipeItem Text="Download" Foreground="White" Background="DarkGray" Invoked="SwipeItem_Invoked">
+                                <SwipeItem.IconSource>
+                                    <SymbolIconSource Symbol="Download"/>
+                                </SwipeItem.IconSource>
+                            </SwipeItem>
+                            <SwipeItem Text="Favorite" Foreground="White" Background="{ThemeResource SystemAccentColor}" Invoked="FavoriteSwipeItem_Invoked">
+                                <SwipeItem.IconSource>
+                                    <SymbolIconSource Symbol="Favorite"/>
+                                </SwipeItem.IconSource>
+                            </SwipeItem>
+                        </SwipeItems>
+                    </SwipeControl.RightItems>
+                    <Grid Height="90" x:Name="RootGrid" Margin="12,0,12,0">
+                        <Grid.Resources>
+                            <Thickness x:Key="IconButtonMargin">2,0,0,0</Thickness>
+                        </Grid.Resources>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="128" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Image x:Name="itemImage" Width="128" Height="72">
+                            <Image.Source>
+                                <BitmapImage UriSource="{x:Bind ItemThumbnail}" />
+                            </Image.Source>
+                        </Image>
+                        <StackPanel Margin="14,0,0,0" Grid.Column="1" VerticalAlignment="Center" >
+                            <TextBlock FontWeight="Bold" x:Name="itemTitle"  Text="{x:Bind Title}" TextWrapping="Wrap" />
+                            <TextBlock x:Name="itemsubTitle"  Text="{x:Bind Subtitle}" TextWrapping="NoWrap" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="itemspublishdate" Text="{x:Bind localfunc:NavigationRoot.ShortDate(PublishDate.Date)}" TextWrapping="NoWrap" />
+                                <TextBlock x:Name="itemspublishdata" Margin="16,0,0,0" Text="{x:Bind Duration}" TextWrapping="NoWrap" />
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                    <StackPanel x:Name="SecondaryCommandPanel" Visibility="Collapsed" Orientation="Horizontal" Grid.Column="2">
-                        <StackPanel.Resources>
-                            <ResourceDictionary>
-                                <ResourceDictionary.ThemeDictionaries>
-                                    <ResourceDictionary x:Key="Light">
-                                        <SolidColorBrush x:Key="ButtonRevealBackgroundPressed" Color="DarkGray" />
-                                    </ResourceDictionary>
-                                    <ResourceDictionary x:Key="Dark">
-                                        <SolidColorBrush x:Key="ButtonRevealBackgroundPressed" Color="DarkGray" />
-                                    </ResourceDictionary>
-                                </ResourceDictionary.ThemeDictionaries>
-                            </ResourceDictionary>
-                        </StackPanel.Resources>
+                        <StackPanel x:Name="SecondaryCommandPanel" Visibility="Collapsed" Orientation="Horizontal" Grid.Column="2">
+                            <StackPanel.Resources>
+                                <ResourceDictionary>
+                                    <ResourceDictionary.ThemeDictionaries>
+                                        <ResourceDictionary x:Key="Light">
+                                            <SolidColorBrush x:Key="ButtonRevealBackgroundPressed" Color="DarkGray" />
+                                        </ResourceDictionary>
+                                        <ResourceDictionary x:Key="Dark">
+                                            <SolidColorBrush x:Key="ButtonRevealBackgroundPressed" Color="DarkGray" />
+                                        </ResourceDictionary>
+                                    </ResourceDictionary.ThemeDictionaries>
+                                </ResourceDictionary>
+                            </StackPanel.Resources>
 
-                        <!--Download button-->
-                        <Button Width="50" Height="50" Style="{StaticResource ButtonRevealStyle}" Background="{ThemeResource AppBarButtonRevealBackground}" Margin="{StaticResource IconButtonMargin}" CommandParameter="{x:Bind}" ToolTipService.ToolTip="Download" Click="DownloadButton_Click">
-                            <Button.Content>
-                                <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" >
-                                    <SymbolIcon Symbol="Download" />
-                                </Viewbox>
-                            </Button.Content>
-                        </Button>
+                            <!--Download button-->
+                            <Button Width="50" Height="50" Style="{StaticResource ButtonRevealStyle}" Background="{ThemeResource AppBarButtonRevealBackground}" Margin="{StaticResource IconButtonMargin}" CommandParameter="{x:Bind}" ToolTipService.ToolTip="Download" Click="DownloadButton_Click">
+                                <Button.Content>
+                                    <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" >
+                                        <SymbolIcon Symbol="Download" />
+                                    </Viewbox>
+                                </Button.Content>
+                            </Button>
 
-                        <!--Favorite button-->
-                        <!--TODO: Toggle the star between outline and filled?-->
-                        <Button Width="50" Height="50" Style="{StaticResource ButtonRevealStyle}" Background="{ThemeResource AppBarButtonRevealBackground}" Margin="{StaticResource IconButtonMargin}" ToolTipService.ToolTip="Favorite" CommandParameter="{x:Bind}" Click="FavoriteButton_Click" >
-                            <Button.Content>
-                                <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" >
-                                    <SymbolIcon Symbol="OutlineStar" />
-                                </Viewbox>
-                            </Button.Content>
-                        </Button>
-                    </StackPanel>
-                </Grid>
+                            <!--Favorite button-->
+                            <!--TODO: Toggle the star between outline and filled?-->
+                            <Button Width="50" Height="50" Style="{StaticResource ButtonRevealStyle}" Background="{ThemeResource AppBarButtonRevealBackground}" Margin="{StaticResource IconButtonMargin}" ToolTipService.ToolTip="Favorite" CommandParameter="{x:Bind}" Click="FavoriteButton_Click" >
+                                <Button.Content>
+                                    <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" >
+                                        <SymbolIcon Symbol="OutlineStar" />
+                                    </Viewbox>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </SwipeControl>
             </DataTemplate>
 
             <DataTemplate x:Key="GriditemTemplate" x:DataType="datamodel:Episode">
