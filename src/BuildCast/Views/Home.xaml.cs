@@ -37,6 +37,8 @@ namespace BuildCast.Views
             this.InitializeComponent();
 
             HomeFeedGrid.ItemsSource = FeedStore.AllFeeds;
+
+            ConfigureAnimations();
         }
 
         public HomeViewModel ViewModel { get; set; }
@@ -129,6 +131,7 @@ namespace BuildCast.Views
         #region staggering
         private void HomeFeedGrid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
+            args.ItemContainer.Loaded += ItemContainer_Loaded;
         }
 
         private void ItemContainer_Loaded(object sender, RoutedEventArgs e)
@@ -183,6 +186,7 @@ namespace BuildCast.Views
         {
             var selectedFeed = e.ClickedItem as Feed;
             _persistedItemIndex = HomeFeedGrid.Items.IndexOf(e.ClickedItem);
+            HomeFeedGrid.PrepareConnectedAnimation("PodcastImageBorder", e.ClickedItem, "Image");
             ViewModel.NavigateToFeed(selectedFeed);
         }
 
