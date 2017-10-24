@@ -124,6 +124,11 @@ namespace BuildCast.Views
 
         private void ConfigureAnimations()
         {
+            ElementCompositionPreview.SetIsTranslationEnabled(paraimage, true);
+            ElementCompositionPreview.SetImplicitShowAnimation(paraimage, VisualHelpers.CreateVerticalOffsetAnimationFrom(0.55, -150));
+            ElementCompositionPreview.SetImplicitHideAnimation(paraimage, VisualHelpers.CreateVerticalOffsetAnimationTo(0.55, -150));
+            ElementCompositionPreview.SetImplicitHideAnimation(paraimage, VisualHelpers.CreateOpacityAnimation(0.4, 0));
+
             Canvas.SetZIndex(this, 1);
             ElementCompositionPreview.SetImplicitHideAnimation(this, VisualHelpers.CreateOpacityAnimation(0.4, 0));
         }
