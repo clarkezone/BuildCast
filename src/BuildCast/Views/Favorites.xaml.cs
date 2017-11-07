@@ -11,12 +11,17 @@
 // ******************************************************************
 
 using BuildCast.DataModel;
+using BuildCast.DataModel.DM2;
 using BuildCast.Helpers;
 using BuildCast.Services.Navigation;
 using BuildCast.ViewModels;
+using System;
+using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Hosting;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
@@ -24,12 +29,15 @@ namespace BuildCast.Views
 {
     public sealed partial class Favorites : Page, IPageWithViewModel<FavoritesViewModel>
     {
+        private UIElement cachedSecondaryCommandChildPanel = null;
+        private UIElement cachedSecondaryPlayIcon = null;
+
         public Favorites()
         {
             this.InitializeComponent();
 
             ConfigureAnimations();
-
+            
             //lstFilter.SelectedItem = 0;
         }
 
@@ -113,65 +121,122 @@ namespace BuildCast.Views
 
         private void FavoriteListView_Tapped(object sender, ItemClickEventArgs e)
         {
-            if (e.ClickedItem is EpisodeWithState episode)
-            {
-                ViewModel.NavigateToEpisodeAsync(episode.Episode);
-            }
+            //TODO:
+            throw new Exception();
+            //if (e.ClickedItem is EpisodeWithState episode)
+            //{
+            //    ViewModel.NavigateToEpisodeAsync(episode.Episode);
+            //}
         }
 
-        private void Grid_PointerEntered(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
-        {
-            Grid originGrid = (Grid)sender;
+        private void DownloadEpisode(Episode2 episode) => ViewModel.DownloadEpisode(episode);
 
-            Grid hoverGrid = (Grid)originGrid.Children[originGrid.Children.Count - 1];
-            hoverGrid.Visibility = Visibility.Visible;
-        }
+        private void RemoveFavoritedEpisode(Episode2 episode) => ViewModel.RemoveFavoritedEpisode(episode);
 
-        private void Grid_PointerExited(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
-        {
-            Grid originGrid = (Grid)sender;
-
-            Grid hoverGrid = (Grid)originGrid.Children[originGrid.Children.Count - 1];
-            hoverGrid.Visibility = Visibility.Collapsed;
-        }
-
-        private void DownloadEpisode(Episode episode) => ViewModel.DownloadEpisode(episode);
-
-        private void RemoveFavoritedEpisode(Episode episode) => ViewModel.RemoveFavoritedEpisode(episode);
+        private void DeleteEpisode(Episode2 episode) => ViewModel.RemoveDownloadedEpisode(episode);
 
         private void RefreshList() => ViewModel.Refresh();
 
-        private void AppBarButton_Click(object sender, RoutedEventArgs e)
+        private void ContainerItem_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            EpisodeWithState episodePointer = (EpisodeWithState)(sender as AppBarButton).DataContext;
-            DownloadEpisode(episodePointer.Episode);
+            // Only show the hover buttons when the mouse or pen enters the item.
+            if (e.Pointer.PointerDeviceType != Windows.Devices.Input.PointerDeviceType.Touch)
+            {
+                try
+                {
+                    var item = sender as ListViewItem;
+                    var secondaryCommandPanel = item.GetVisualChildByName<StackPanel>("SecondaryCommandPanel");
+                    var commandPanelChildHolder = secondaryCommandPanel.GetVisualChildByName<Grid>("ButtonHolder");
+
+                    var commandPanelChild = commandPanelChildHolder.GetVisualChildByName<Button>("DownloadButton");
+
+                    // If the episode is already downloaded, then show delete button instead
+                    if ((item.Content as Episode2).IsDownloaded)
+                    {
+                        commandPanelChild = commandPanelChildHolder.GetVisualChildByName<Button>("DeleteButton");
+                    }
+
+                    var secondaryPlayIcon = item.GetVisualChildByName<Grid>("PlayIcon");
+
+                    commandPanelChild.Visibility = Visibility.Visible;
+                    secondaryPlayIcon.Visibility = Visibility.Visible;
+
+                    cachedSecondaryCommandChildPanel = commandPanelChild;
+                    cachedSecondaryPlayIcon = secondaryPlayIcon;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Catastrophic error: " + ex.Message);
+                }
+            }
         }
 
-        private void AppBarButton_Click_1(object sender, RoutedEventArgs e)
+        private void ContainerItem_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            EpisodeWithState episodePointer = (EpisodeWithState)(sender as AppBarButton).DataContext;
-            RemoveFavoritedEpisode(episodePointer.Episode);
+            if (e.Pointer.PointerDeviceType != Windows.Devices.Input.PointerDeviceType.Touch && cachedSecondaryCommandChildPanel != null)
+            {
+                cachedSecondaryCommandChildPanel.Visibility = Visibility.Collapsed;
+                cachedSecondaryCommandChildPanel = null;
+
+                cachedSecondaryPlayIcon.Visibility = Visibility.Collapsed;
+                cachedSecondaryPlayIcon = null;
+            }
         }
 
         private void SwipeDownload_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
-            if (args.SwipeControl.DataContext is EpisodeWithState target)
+            if (args.SwipeControl.DataContext is Episode2 target)
             {
-                DownloadEpisode(target.Episode);
+                DownloadEpisode(target);
             }
         }
 
         private void SwipeUnfavorite_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
-            if (args.SwipeControl.DataContext is EpisodeWithState target)
+            if (args.SwipeControl.DataContext is Episode2 target)
             {
-                RemoveFavoritedEpisode(target.Episode);
+                RemoveFavoritedEpisode(target);
             }
         }
 
         private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
             RefreshList();
+        }
+
+        private void FavoriteListView_ChoosingItemContainer(ListViewBase sender, ChoosingItemContainerEventArgs args)
+        {
+            // Do we already have an ItemContainer? If so, we're done here.
+            if (args.ItemContainer != null)
+            {
+                return;
+            }
+
+            ListViewItem containerItem = new ListViewItem();
+
+            // Show hover buttons
+            containerItem.PointerEntered += ContainerItem_PointerEntered;
+            containerItem.PointerExited += ContainerItem_PointerExited;
+
+            args.ItemContainer = containerItem;
+        }
+
+        private void UnfaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            Episode2 episodePointer = (Episode2)(sender as Button).DataContext;
+            RemoveFavoritedEpisode(episodePointer);
+        }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            Episode2 episodePointer = (Episode2)(sender as Button).DataContext;
+            DeleteEpisode(episodePointer);
+        }
+
+        private void DownloadButton_Click(object sender, RoutedEventArgs e)
+        {
+            Episode2 episodePointer = (Episode2)(sender as Button).DataContext;
+            DownloadEpisode(episodePointer);
         }
     }
 }

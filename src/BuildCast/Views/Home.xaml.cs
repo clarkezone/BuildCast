@@ -25,6 +25,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using BuildCast.DataModel.DM2;
 
 namespace BuildCast.Views
 {
@@ -192,7 +193,12 @@ namespace BuildCast.Views
             var selectedFeed = e.ClickedItem as Feed;
             _persistedItemIndex = HomeFeedGrid.Items.IndexOf(e.ClickedItem);
             HomeFeedGrid.PrepareConnectedAnimation("PodcastImageBorder", e.ClickedItem, "Image");
-            ViewModel.NavigateToFeed(selectedFeed);
+
+            //TODO
+            var r = DataModelManager.RealmInstance.All<Feed2>().Where(a => a.UriKey_ == selectedFeed.Uri.ToString()).FirstOrDefault();
+
+            Debug.Assert(r != null, "R is null");
+            ViewModel.NavigateToFeed(r);
         }
 
         private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
@@ -209,7 +215,7 @@ namespace BuildCast.Views
 
         private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
-            ViewModel.NavigateToEpisode(args.SelectedItem as Episode);
+            ViewModel.NavigateToEpisode(args.SelectedItem as Episode2);
         }
     }
 }

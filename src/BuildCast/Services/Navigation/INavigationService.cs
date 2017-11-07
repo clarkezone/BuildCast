@@ -13,6 +13,7 @@
 using System;
 using System.Threading.Tasks;
 using BuildCast.DataModel;
+using BuildCast.DataModel.DM2;
 
 namespace BuildCast.Services.Navigation
 {
@@ -38,11 +39,13 @@ namespace BuildCast.Services.Navigation
 
         Task NavigateToSettingsAsync();
 
-        Task NavigateToFeedAsync(Feed feed);
+        Task NavigateToFeedAsync(Feed2 feed);
 
-        Task NavigateToEpisodeAsync(Episode episode);
+        Task NavigateToEpisodeAsync(Episode2 episode, Feed2 selector);
 
-        Task NavigateToPlayerAsync(Episode episode);
+        Task NavigateToEpisodeAsync(Episode2 episode);
+
+        Task NavigateToPlayerAsync(Episode2 episode);
 
         Task NavigateToPlayerAsync(InkNote inkNote);
 

@@ -10,29 +10,32 @@
 // THE CODE OR THE USE OR OTHER DEALINGS IN THE CODE.
 // ******************************************************************
 
-using System;
-using System.Threading.Tasks;
-using BuildCast.DataModel;
-using BuildCast.DataModel.DM2;
+using System.Threading;
+using Realms;
 
-namespace BuildCast.Services
+namespace BuildCast.DataModel.DM2
 {
-    public interface IPlayerService
+    public static class DataModelManager
     {
-        NowPlayingState NowPlaying { get; }
+        private const string REALMDBNAME = "BuildCastDB";
+        private static ThreadLocal<Realm> instance;
 
-        Task SetNewItem(Uri currentItem, TimeSpan currentTime, bool startPlayback, string localFilename);
+        public static Realm RealmInstance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new ThreadLocal<Realm>();
+                }
 
-        void SetTime(TimeSpan currentTime);
+                if (instance.Value == null)
+                {
+                    instance.Value = Realm.GetInstance(REALMDBNAME);
+                }
 
-        Task Play(Episode2 episode, TimeSpan playTime);
-
-        void Pause();
-
-        void FastForward();
-
-        void Rewind();
-
-        Task<byte[]> GetBitmapForCurrentFrameFromLocalFile();
+                return instance.Value;
+            }
+        }
     }
 }

@@ -17,6 +17,7 @@ namespace BuildCast.ViewModels
     using System.Threading.Tasks;
     using System.Windows.Input;
     using BuildCast.DataModel;
+    using BuildCast.DataModel.DM2;
     using BuildCast.Helpers;
     using BuildCast.Services.Navigation;
     using Microsoft.Toolkit.Uwp.Helpers;
@@ -24,7 +25,7 @@ namespace BuildCast.ViewModels
     public class FavoritesViewModel : INotifyPropertyChanged
     {
         private INavigationService _navigationService;
-        private IQueryable<EpisodeWithState> _favorites;
+        private IQueryable<Episode2> _favorites;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -33,31 +34,42 @@ namespace BuildCast.ViewModels
             _navigationService = navigationService;
         }
 
-        public void DownloadEpisode(Episode episode)
+        public void DownloadEpisode(Episode2 episode)
         {
-            var task = BackgroundDownloadHelper.Download(new System.Uri(episode.Key));
+            var task = BackgroundDownloadHelper.Download(new System.Uri(episode.UriKey));
         }
 
-        public async void RemoveFavoritedEpisode(Episode episode)
+        public async void RemoveDownloadedEpisode(Episode2 episode)
         {
-            using (var db = new LocalStorageContext())
+            if (episode != null)
             {
-                foreach (Favorite favEntity in db.Favorites)
-                {
-                    if (episode == null)
-                    {
-                        break;
-                    }
-
-                    if (favEntity.EpisodeId == episode.Id)
-                    {
-                        db.Favorites.Remove(favEntity);
-                        break;
-                    }
-                }
-
-                db.SaveChanges();
+                await episode.DeleteDownloaded();
+                await LoadFavorites();
             }
+        }
+
+        public async void RemoveFavoritedEpisode(Episode2 episode)
+        {
+            //TODO:
+            throw new System.Exception();
+            //using (var db = new LocalStorageContext())
+            //{
+            //    foreach (Favorite favEntity in db.Favorites)
+            //    {
+            //        if (episode == null)
+            //        {
+            //            break;
+            //        }
+
+            //        if (favEntity.EpisodeId == episode.Id)
+            //        {
+            //            db.Favorites.Remove(favEntity);
+            //            break;
+            //        }
+            //    }
+
+            //    db.SaveChanges();
+            //}
 
             await LoadFavorites();
         }
@@ -67,7 +79,7 @@ namespace BuildCast.ViewModels
             await LoadFavorites();
         }
 
-        public IQueryable<EpisodeWithState> Favorites
+        public IQueryable<Episode2> Favorites
         {
             get
             {
@@ -84,7 +96,7 @@ namespace BuildCast.ViewModels
             }
         }
 
-        public Task NavigateToEpisodeAsync(Episode episode) => _navigationService.NavigateToPlayerAsync(episode);
+        public Task NavigateToEpisodeAsync(Episode2 episode) => _navigationService.NavigateToPlayerAsync(episode);
 
         internal async Task LoadFavorites()
         {
@@ -102,15 +114,16 @@ namespace BuildCast.ViewModels
 
         private void BuildFavorites(LocalStorageContext db)
         {
-            var results2 = from fav in db.Favorites
-                           join eps in db.EpisodeCache
-                           on fav.EpisodeId equals eps.Id
-                           join state in db.PlaybackState
-                           on eps.Key equals state.EpisodeKey into myJoin
-                           from sub in myJoin.DefaultIfEmpty()
-                           select new EpisodeWithState { Episode = eps, PlaybackState = sub ?? new EpisodePlaybackState() };
+            throw new System.Exception();
+            //var results2 = from fav in db.Favorites
+            //               join eps in db.EpisodeCache
+            //               on fav.EpisodeId equals eps.Id
+            //               join state in db.PlaybackState
+            //               on eps.Key equals state.EpisodeKey into myJoin
+            //               from sub in myJoin.DefaultIfEmpty()
+            //               select new EpisodeWithState { Episode = eps, PlaybackState = sub ?? new EpisodePlaybackState() };
 
-            Favorites = results2;
+            //Favorites = results2;
         }
     }
 }

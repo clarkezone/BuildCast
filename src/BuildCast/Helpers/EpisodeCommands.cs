@@ -13,6 +13,7 @@
 using System;
 using System.Windows.Input;
 using BuildCast.DataModel;
+using BuildCast.DataModel.DM2;
 
 namespace BuildCast.Helpers
 {
@@ -104,12 +105,11 @@ namespace BuildCast.Helpers
 
         public async void Execute(object parameter)
         {
-            var episodeWithState = parameter as EpisodeWithState;
-            Episode episode = episodeWithState?.Episode;
+            Episode2 episode = parameter as Episode2;
 
             if (episode == null)
             {
-                episode = parameter as Episode;
+                episode = parameter as Episode2;
             }
 
             if (episode == null)
@@ -137,32 +137,28 @@ namespace BuildCast.Helpers
 
         public void Execute(object parameter)
         {
-            var episodeWithState = parameter as EpisodeWithState;
-            Episode episode = episodeWithState?.Episode;
-
-            if (episode == null)
-            {
-                episode = parameter as Episode;
-            }
+            Episode2 episode = parameter as Episode2;
 
             if (episode == null)
             {
                 return;
             }
 
-            using (var db = new LocalStorageContext())
-            {
-                foreach (Favorite favEntity in db.Favorites)
-                {
-                    if (favEntity.EpisodeId == episode.Id)
-                    {
-                        db.Favorites.Remove(favEntity);
-                        break;
-                    }
-                }
+            //TODO:
+            throw new Exception();
+            //using (var db = new LocalStorageContext())
+            //{
+            //    foreach (Favorite favEntity in db.Favorites)
+            //    {
+            //        if (favEntity.EpisodeId == episode.Id)
+            //        {
+            //            db.Favorites.Remove(favEntity);
+            //            break;
+            //        }
+            //    }
 
-                db.SaveChanges();
-            }
+            //    db.SaveChanges();
+            //}
         }
     }
 
@@ -180,27 +176,23 @@ namespace BuildCast.Helpers
 
         public void Execute(object parameter)
         {
-            var episodeWithState = parameter as EpisodeWithState;
-            Episode episode = episodeWithState?.Episode;
-
-            if (episode == null)
-            {
-                episode = parameter as Episode;
-            }
+            Episode2 episode = parameter as Episode2;
 
             if (episode == null)
             {
                 return;
             }
 
-            var task = BackgroundDownloadHelper.Download(new Uri(episode.Key));
-            task.ContinueWith(async (state) =>
-            {
-                if (state.Result == DownloadStartResult.AllreadyDownloaded)
-                {
-                    await episode.SetDownloaded();
-                }
-            });
+            //TODO:
+            throw new Exception();
+            //var task = BackgroundDownloadHelper.Download(new Uri(episode.Key));
+            //task.ContinueWith(async (state) =>
+            //{
+            //    if (state.Result == DownloadStartResult.AllreadyDownloaded)
+            //    {
+            //        await episode.SetDownloaded();
+            //    }
+            //});
 
             System.Diagnostics.Debug.WriteLine("Downloading episode...");
         }

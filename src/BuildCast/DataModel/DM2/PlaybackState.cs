@@ -10,29 +10,40 @@
 // THE CODE OR THE USE OR OTHER DEALINGS IN THE CODE.
 // ******************************************************************
 
-using BuildCast.DataModel;
+using System;
 using BuildCast.DataModel.DM2;
-using BuildCast.Services.Navigation;
+using Realms;
 
-namespace BuildCast.ViewModels
+namespace BuildCast.DataModel
 {
-    public class HomeViewModel
+    public class PlaybackState : RealmObject
     {
-        private INavigationService _navigationService;
-
-        public HomeViewModel(INavigationService navigationService)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlaybackState"/> class.
+        /// Public Constructor required by EF
+        /// </summary>
+        public PlaybackState()
         {
-            _navigationService = navigationService;
         }
 
-        public void NavigateToFeed(Feed2 selectedFeed)
+        public PlaybackState(Episode2 episode)
         {
-            var ignored = _navigationService.NavigateToFeedAsync(selectedFeed);
+            this.Episode = episode;
         }
 
-        public void NavigateToEpisode(Episode2 episode)
+        //TODO BackPointer
+        public Episode2 Episode { get; set; }
+
+        public double ListenProgress { get; set; }
+
+        public double GetPercentDouble (Episode2 e)
         {
-            var ignored = _navigationService.NavigateToEpisodeAsync(episode);
+            return (ListenProgress / e.Duration.TotalMilliseconds) * 100;
+        }
+
+        public string GetPercent(Episode2 e)
+        {
+            return $"{(int)((ListenProgress / e.Duration.TotalMilliseconds) * 100)}%";
         }
     }
 }

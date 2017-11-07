@@ -13,6 +13,7 @@
 using System;
 using System.Threading.Tasks;
 using BuildCast.DataModel;
+using BuildCast.DataModel.DM2;
 using BuildCast.Helpers;
 using BuildCast.Services.Navigation;
 using Windows.UI.Xaml.Navigation;
@@ -30,32 +31,34 @@ namespace BuildCast.ViewModels
 
         public event EventHandler DownloadError;
 
-        public Episode CurrentEpisode { get; set; }
+        public Episode2 CurrentEpisode { get; set; }
 
         // These methods need to be moved into the Episode
         public void PlayCurrentEpisode()
         {
-            _navigationService.NavigateToPlayerAsync(CurrentEpisode);
+            //TODO
+            //_navigationService.NavigateToPlayerAsync(CurrentEpisode);
         }
 
         public void FavoriteCurrentEpisode()
         {
             using (var db = new LocalStorageContext())
             {
-                db.Favorites.Add(new Favorite(CurrentEpisode));
-                db.SaveChanges();
+                //TODO
+                //db.Favorites.Add(new Favorite(CurrentEpisode));
+                //db.SaveChanges();
             }
         }
 
         public void DownloadCurrentEpisode()
         {
-            var task = BackgroundDownloadHelper.Download(new Uri(CurrentEpisode.Key));
+            var task = BackgroundDownloadHelper.Download(new Uri(CurrentEpisode.UriKey));
             task.ContinueWith(t => DownloadError?.Invoke(this, EventArgs.Empty), TaskContinuationOptions.OnlyOnFaulted);
         }
 
         public Task NavigatedTo(NavigationMode navigationMode, object parameter)
         {
-            if (parameter is Episode episode)
+            if (parameter is Episode2 episode)
             {
                 CurrentEpisode = episode;
             }

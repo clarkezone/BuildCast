@@ -21,6 +21,7 @@ namespace BuildCast.ViewModels
     using BuildCast.Helpers;
     using BuildCast.Services.Navigation;
     using Microsoft.Toolkit.Uwp.Helpers;
+    using BuildCast.DataModel.DM2;
 
     public class NotesViewModel : INotifyPropertyChanged
     {
@@ -72,11 +73,14 @@ namespace BuildCast.ViewModels
 
         public void NavigateToItem(object clickedItem)
         {
-            if (clickedItem is EpisodeWithState)
-            {
-                NavigateToEpisode((clickedItem as EpisodeWithState).Episode);
-                return;
-            }
+            //TODO:
+            throw new Exception();
+
+            //if (clickedItem is EpisodeWithState)
+            //{
+            //    NavigateToEpisode((clickedItem as EpisodeWithState).Episode);
+            //    return;
+            //}
 
             dynamic output = clickedItem;
             Guid inkId = output.InkId;
@@ -102,7 +106,7 @@ namespace BuildCast.ViewModels
             }
         }
 
-        private void NavigateToEpisode(Episode episode)
+        private void NavigateToEpisode(Episode2 episode)
         {
             var ignored = _navigationService.NavigateToPlayerAsync(episode);
         }

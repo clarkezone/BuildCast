@@ -20,7 +20,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Windows.UI.Xaml.Controls"
     xmlns:media="using:Windows.UI.Xaml.Media"
-    xmlns:datamodel="using:BuildCast.DataModel"
+    xmlns:datamodel="using:BuildCast.DataModel.DM2"
     xmlns:views="using:BuildCast.Views"
     mc:Ignorable="d" Loaded="Notes_Loaded"
     xmlns:helpers="using:BuildCast.Helpers"
@@ -71,7 +71,7 @@
                 </SwipeControl>
             </DataTemplate>
             
-            <DataTemplate x:Key="episodeTemplate" x:DataType="datamodel:EpisodeWithState">
+            <DataTemplate x:Key="episodeTemplate" x:DataType="datamodel:Episode2">
                 <Grid PointerEntered="Grid_PointerEntered" PointerExited="Grid_PointerExited" Background="{ThemeResource SystemControlTransparentBrush}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="80"></ColumnDefinition>
@@ -83,12 +83,12 @@
                     
                     <Image Grid.Column="0" Width="40" Height="40" >
                         <Image.Source>
-                            <BitmapImage UriSource="{x:Bind Episode.ItemThumbnail}" />
+                            <BitmapImage UriSource="{x:Bind ItemThumbnail}" />
                         </Image.Source>
                     </Image>
-                    <TextBlock Text="{x:Bind Episode.Title}" Grid.Column="1"/>
-                    <FontIcon Visibility="{x:Bind Episode.IsDownloaded}" Glyph="&#xE118;" Grid.Column="2" HorizontalAlignment="Center" />
-                    <TextBlock Text="{x:Bind  PlaybackState.GetPercent(Episode)}" FontSize="30" Grid.Column="3"/>
+                    <TextBlock Text="{x:Bind Title}" Grid.Column="1"/>
+                    <FontIcon Visibility="{x:Bind IsDownloaded}" Glyph="&#xE118;" Grid.Column="2" HorizontalAlignment="Center" />
+                    <TextBlock Text="{x:Bind  GetPercentString()}" FontSize="30" Grid.Column="3"/>
 
                     <Grid Grid.Column="4">
                         <AppBarButton Width="30" Height="30" Icon="Delete" VerticalAlignment="Top" IsTabStop="False" Style="{StaticResource hoverAppbutton}"/>

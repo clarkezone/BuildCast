@@ -29,6 +29,7 @@ using Windows.System.Display;
 using Windows.UI.Composition;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using BuildCast.DataModel.DM2;
 
 namespace BuildCast.Services
 {
@@ -84,17 +85,17 @@ namespace BuildCast.Services
         public async Task HandlePlayRequest(BuildCast.DataModel.InkNote i)
         {
             var shouldPlay = _nowPlayingState.HandlePlayRequest(i);
-            await SetNewItem(new Uri(_nowPlayingState.CurrentEpisode.Key), _nowPlayingState.CurrentTime, shouldPlay, _nowPlayingState.CurrentEpisode.Id.ToString());
+            await SetNewItem(new Uri(_nowPlayingState.CurrentEpisode.UriKey), _nowPlayingState.CurrentTime, shouldPlay, _nowPlayingState.CurrentEpisode.LocalFileName);
         }
 
-        public async Task HandlePlayRequest(Episode e)
+        public async Task HandlePlayRequest(Episode2 e)
         {
             var shouldPlay = await _nowPlayingState.HandlePlayRequest(e);
 
             if (_nowPlayingState.CurrentEpisode != null && shouldPlay.Item1)
             {
                 // if we need to switch to a new item, set new item and open it for playback
-                await SetNewItem(new Uri(_nowPlayingState.CurrentEpisode.Key), _nowPlayingState.CurrentTime, shouldPlay.Item2, _nowPlayingState.CurrentEpisode.Id.ToString());
+                await SetNewItem(new Uri(_nowPlayingState.CurrentEpisode.UriKey), _nowPlayingState.CurrentTime, shouldPlay.Item2, _nowPlayingState.CurrentEpisode.LocalFileName);
             }
             else if (_nowPlayingState.CurrentEpisode != null && !shouldPlay.Item1)
             {
@@ -112,13 +113,13 @@ namespace BuildCast.Services
         }
 
         #region Playback Commands
-        public async Task Play(Episode ep, TimeSpan playTime)
+        public async Task Play(Episode2 ep, TimeSpan playTime)
         {
             await Microsoft.Toolkit.Uwp.Helpers.DispatcherHelper.AwaitableRunAsync(_dispatcher, () =>
             {
                 if (_mediaPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.None)
                 {
-                    return SetNewItem(new Uri(ep.Key), playTime, true, string.Empty);
+                    return SetNewItem(new Uri(ep.UriKey), playTime, true, string.Empty);
                 }
                 else
                 {
@@ -293,7 +294,7 @@ namespace BuildCast.Services
                 // TODO: handle error
                 if (_nowPlayingState.CurrentEpisode != null)
                 {
-                    var setItemTask = SetNewItem(new Uri(_nowPlayingState.CurrentEpisode.Key), _nowPlayingState.CurrentTime, false, _nowPlayingState.CurrentEpisode.Id.ToString());
+                    var setItemTask = SetNewItem(new Uri(_nowPlayingState.CurrentEpisode.UriKey), _nowPlayingState.CurrentTime, false, _nowPlayingState.CurrentEpisode.LocalFileName);
                 }
             });
         }

@@ -24,13 +24,14 @@ using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using BuildCast.DataModel.DM2;
 
 namespace BuildCast.Views
 {
     public sealed partial class Player : Page, IPageWithViewModel<PlayerViewModel>, IFullscreenPage
     {
         private Feed _currentFeed;
-        private Episode _currentEpisode;
+        private Episode2 _currentEpisode;
 
         private RelayCommand _addBookmarkCommand;
         private DispatcherTimer _timer;
@@ -209,7 +210,7 @@ namespace BuildCast.Views
         {
             if (nowPlaying.HasItem && imageBytes != null)
             {
-                BuildCast.DataModel.InkNote meme = new BuildCast.DataModel.InkNote(nowPlaying.CurrentEpisode.Key, PlayerService.Current.CurrentTime);
+                BuildCast.DataModel.InkNote meme = new BuildCast.DataModel.InkNote(nowPlaying.CurrentEpisode.UriKey, PlayerService.Current.CurrentTime);
 
                 InkNoteData = new InkNoteData();
                 InkNoteData.ImageBytes = imageBytes;
@@ -239,7 +240,7 @@ namespace BuildCast.Views
                         async () =>
                         {
                             var nowPlaying = PlayerService.Current.NowPlaying;
-                            BuildCast.DataModel.InkNote meme = new BuildCast.DataModel.InkNote(nowPlaying.CurrentEpisode.Key, PlayerService.Current.CurrentTime);
+                            BuildCast.DataModel.InkNote meme = new BuildCast.DataModel.InkNote(nowPlaying.CurrentEpisode.UriKey, PlayerService.Current.CurrentTime);
                             meme.NoteText = bookmarkContent.Text;
                             using (LocalStorageContext lsc = new LocalStorageContext())
                             {
@@ -267,19 +268,20 @@ namespace BuildCast.Views
             else if (!(e.Parameter is string))
             {
                 // Rome requests have already handled playback request.
-                var paramItem = e.Parameter as Episode;
+                var paramItem = e.Parameter as Episode2;
                 await PlayerService.Current.HandlePlayRequest(paramItem);
             }
 
-            // Update the UI
-            var playbackState = PlayerService.Current.NowPlaying;
-            if (playbackState.CurrentEpisode != null)
-            {
-                SetNowPlaying(playbackState.CurrentFeed, playbackState.CurrentEpisode, playbackState.CurrentTime);
-            }
+            //TODO
+            //// Update the UI
+            //var playbackState = PlayerService.Current.NowPlaying;
+            //if (playbackState.CurrentEpisode != null)
+            //{
+            //    SetNowPlaying(playbackState.CurrentFeed, playbackState.CurrentEpisode, playbackState.CurrentTime);
+            //}
         }
 
-        internal void SetNowPlaying(Feed feed, Episode episode, TimeSpan currenttime)
+        internal void SetNowPlaying(Feed feed, Episode2 episode, TimeSpan currenttime)
         {
             this._currentFeed = feed;
             this._currentEpisode = episode;

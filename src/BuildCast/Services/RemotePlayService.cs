@@ -237,19 +237,21 @@ namespace BuildCast.Services
                 switch (commandString)
                 {
                     case PLAYCOMMAND:
-                        LocalStorageContext context = new LocalStorageContext();
-                        Episode episode = context.EpisodeCache.Where(ep => ep.Key == requestMessageValues[PLAYCOMMAND].ToString()).FirstOrDefault();
-                        if (episode != null)
-                        {
-                            await _navigationService.NavigateToPlayerAsync(episode: null);
-                            TimeSpan playTime = TimeSpan.Zero;
-                            if (requestMessageValues.ContainsKey(PLAYTIME))
-                            {
-                                TimeSpan.TryParse(requestMessageValues[PLAYTIME].ToString(), out playTime);
-                            }
+                        //TODO:
+                        throw new Exception();
+                        //LocalStorageContext context = new LocalStorageContext();
+                        //Episode episode = context.EpisodeCache.Where(ep => ep.Key == requestMessageValues[PLAYCOMMAND].ToString()).FirstOrDefault();
+                        //if (episode != null)
+                        //{
+                        //    await _navigationService.NavigateToPlayerAsync(episode: null);
+                        //    TimeSpan playTime = TimeSpan.Zero;
+                        //    if (requestMessageValues.ContainsKey(PLAYTIME))
+                        //    {
+                        //        TimeSpan.TryParse(requestMessageValues[PLAYTIME].ToString(), out playTime);
+                        //    }
 
-                            await _playerService.Play(episode, playTime);
-                        }
+                        //    await _playerService.Play(episode, playTime);
+                        //}
 
                         break;
                     case PAUSECOMMAND:
@@ -304,7 +306,7 @@ namespace BuildCast.Services
             public RemoteConnection(AppServiceConnection connection, IPlayerService playerService)
             {
                 _connection = connection;
-                _episodeKey = playerService.NowPlaying.CurrentEpisode.Key;
+                _episodeKey = playerService.NowPlaying.CurrentEpisode.UriKey;
                 _playerService = playerService;
             }
 
@@ -404,7 +406,7 @@ namespace BuildCast.Services
                 // TODO: remove this method and call into a single place to start an inknote
                 if (imageBytes != null)
                 {
-                    BuildCast.DataModel.InkNote meme = new BuildCast.DataModel.InkNote(nowPlaying.CurrentEpisode.Key, PlayerService.Current.CurrentTime);
+                    BuildCast.DataModel.InkNote meme = new BuildCast.DataModel.InkNote(nowPlaying.CurrentEpisode.UriKey, PlayerService.Current.CurrentTime);
 
                     var inkNoteData = new InkNoteData() { ImageBytes = imageBytes };
 

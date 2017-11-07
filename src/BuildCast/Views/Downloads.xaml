@@ -1,51 +1,60 @@
 ﻿<!--
-// ******************************************************************
-// Copyright (c) Microsoft. All rights reserved.
-// This code is licensed under the MIT License (MIT).
-// THE CODE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
-// THE CODE OR THE USE OR OTHER DEALINGS IN THE CODE.
-// ******************************************************************
+    // ******************************************************************
+    // Copyright (c) Microsoft. All rights reserved.
+    // This code is licensed under the MIT License (MIT).
+    // THE CODE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+    // INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    // IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+    // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
+    // THE CODE OR THE USE OR OTHER DEALINGS IN THE CODE.
+    // ******************************************************************
 -->
 
 <Page
     x:Class="BuildCast.Views.Downloads"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Windows.UI.Xaml.Controls"
-    xmlns:media="using:Windows.UI.Xaml.Media"
-    xmlns:datamodel="using:BuildCast.DataModel"
-    xmlns:views="using:BuildCast.Views"
-    mc:Ignorable="d" Loaded="Downloads_Loaded"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:datamodel="using:BuildCast.DataModel.DM2"
     xmlns:helpers="using:BuildCast.Helpers"
-    >
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:media="using:Windows.UI.Xaml.Media"
+    xmlns:views="using:BuildCast.Views"
+    mc:Ignorable="d">
 
     <Page.Resources>
-        <helpers:DeleteEpisodeCommand x:Key="deleteEpisodeCommand"/>
+        <helpers:DeleteEpisodeCommand x:Key="deleteEpisodeCommand" />
+
+        <SolidColorBrush x:Key="ButtonRevealBorderBrushPointerOver" Color="Transparent" />
+        <SolidColorBrush x:Key="ButtonRevealBorderBrushPressed" Color="Transparent" />
     </Page.Resources>
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="{StaticResource PageMargin}">
+    <Grid Margin="{StaticResource PageMargin}" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.Resources>
-            <CollectionViewSource x:Name="groupInfoCVS" IsSourceGrouped="false" Source="{x:Bind ViewModel.Downloads, Mode=OneWay}"/>
+            <CollectionViewSource
+                x:Name="groupInfoCVS"
+                IsSourceGrouped="false"
+                Source="{x:Bind ViewModel.Downloads, Mode=OneWay}" />
             <Thickness x:Key="topPosition">0,37,0,0</Thickness>
             <Thickness x:Key="commandbarPosition">0,30,0,0</Thickness>
 
-            <DataTemplate x:Key="downloadTemplate" x:DataType="datamodel:EpisodeWithState">
+            <DataTemplate x:Key="downloadTemplate" x:DataType="datamodel:Episode2">
 
                 <SwipeControl x:Name="swipeContainer">
 
                     <SwipeControl.RightItems>
                         <SwipeItems Mode="Execute">
-                            <SwipeItem x:Name="swipeDelete" Text="Delete" Foreground="{ThemeResource SystemControlForegroundChromeWhiteBrush}" 
-                                       Background="{ThemeResource SystemAccentColor}" Invoked="swipeDelete_Invoked">
+                            <SwipeItem
+                                x:Name="swipeDelete"
+                                Background="{ThemeResource SystemAccentColor}"
+                                Foreground="{ThemeResource SystemControlForegroundChromeWhiteBrush}"
+                                Invoked="swipeDelete_Invoked"
+                                Text="Delete">
                                 <SwipeItem.IconSource>
-                                    <SymbolIconSource Symbol="Delete"/>
+                                    <SymbolIconSource Symbol="Delete" />
                                 </SwipeItem.IconSource>
                             </SwipeItem>
                         </SwipeItems>
@@ -53,62 +62,151 @@
 
                     <Grid Background="{ThemeResource SystemControlTransparentBrush}">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="80"></ColumnDefinition>
-                            <ColumnDefinition Width="80"></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="*" MinWidth="100" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <Image Grid.Column="0" Width="150" Height="90" Margin="5">
+                        <Image
+                            Grid.Column="0"
+                            Width="150"
+                            Height="90"
+                            Margin="5">
                             <Image.Source>
-                                <BitmapImage UriSource="{x:Bind Episode.ItemThumbnail}" DecodePixelWidth="160" DecodePixelHeight="80"/>
+                                <BitmapImage
+                                    DecodePixelHeight="80"
+                                    DecodePixelWidth="160"
+                                    UriSource="{x:Bind ItemThumbnail}" />
                             </Image.Source>
                         </Image>
+
+                        <Grid
+                            x:Name="PlayIcon"
+                            Grid.Column="0"
+                            Width="40"
+                            Height="40"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Background="{ThemeResource SystemControlForegroundChromeBlackMediumLowBrush}"
+                            CornerRadius="40"
+                            Visibility="Collapsed">
+                            <Viewbox
+                                Width="16"
+                                Height="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                <SymbolIcon Foreground="{ThemeResource SystemControlForegroundChromeWhiteBrush}" Symbol="Play" />
+                            </Viewbox>
+                        </Grid>
+
+                        <ProgressBar
+                            Grid.Column="0"
+                            Width="140"
+                            Margin="0,0,0,12"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom"
+                            Maximum="100"
+                            Value="{x:Bind GetPercent()}" />
+
                         <Grid Grid.Column="1" Margin="5">
-                            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Left">
-                                <TextBlock Text="{x:Bind Episode.Title}" HorizontalTextAlignment="Left"/>
-                                <TextBlock x:Name="dateTextBlock" Text="{x:Bind Episode.PublishDate}" Foreground="DarkGray" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalTextAlignment="Left"/>
+                            <StackPanel
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Orientation="Vertical">
+                                <TextBlock
+                                    HorizontalTextAlignment="Left"
+                                    Text="{x:Bind Title}"
+                                    TextWrapping="WrapWholeWords" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock
+                                        x:Name="dateTextBlock"
+                                        Grid.Column="1"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Foreground="DarkGray"
+                                        HorizontalTextAlignment="Left"
+                                        Text="{x:Bind FormatPublishDate()}" />
+                                    <TextBlock
+                                        x:Name="itemspublishdata"
+                                        Margin="16,0,0,0"
+                                        Foreground="DarkGray"
+                                        Text="{x:Bind Duration}"
+                                        TextWrapping="NoWrap" />
+                                </StackPanel>
                             </StackPanel>
                         </Grid>
-                        <FontIcon Visibility="{x:Bind Episode.IsDownloaded}" Glyph="&#xE118;" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBlock Text="{x:Bind  PlaybackState.GetPercent(Episode)}" FontSize="18" Grid.Column="3" TextAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock
+                            Grid.Column="3"
+                            Margin="12,0,0,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                            Text="Episode Downloaded"
+                            Visibility="{x:Bind IsDownloaded}" />
 
-                        <!--<Grid Grid.Column="4" Visibility="Collapsed">
-                            <AppBarButton Width="50" Height="50" Icon="Delete" VerticalAlignment="Top" IsTabStop="False" Style="{StaticResource hoverAppbutton}" Click="AppBarButton_Click"/>
-                        </Grid>-->
+                        <Grid
+                            x:Name="SecondaryCommandPanel"
+                            Grid.Column="4"
+                            Width="48"
+                            Margin="12,0,0,0">
+                            <Button
+                                x:Name="DeleteButton"
+                                Width="48"
+                                Height="48"
+                                Background="{ThemeResource AppBarButtonRevealBackground}"
+                                FontSize="16"
+                                Style="{StaticResource ButtonRevealStyle}"
+                                ToolTipService.ToolTip="Delete"
+                                Visibility="Collapsed">
+                                <Button.Content>
+                                    <Viewbox
+                                        Width="16"
+                                        Height="16"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                        <SymbolIcon Symbol="Delete" />
+                                    </Viewbox>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
                     </Grid>
                 </SwipeControl>
             </DataTemplate>
         </Grid.Resources>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <TextBlock
-                x:Name="title"
-                Grid.Row="0"
-                x:Uid="Downloads_Title"
-                Style="{StaticResource PageTitleStyle}" />
-        
-        <ListView 
-                x:Name="downloadListView"
-                Grid.Row="1"
-                ItemsSource="{Binding Source={StaticResource groupInfoCVS}}"
-                ItemTemplate="{StaticResource downloadTemplate}"
-                ItemClick="DownloadListView_Tapped"
-                IsItemClickEnabled="True"
-                SelectionMode="None"
-                >
+            x:Name="title"
+            x:Uid="Downloads_Title"
+            Grid.Row="0"
+            Style="{StaticResource PageTitleStyle}" />
+
+        <ListView
+            x:Name="downloadListView"
+            Grid.Row="1"
+            Padding="0,0,24,0"
+            ChoosingItemContainer="DownloadListView_ChoosingItemContainer"
+            IsItemClickEnabled="True"
+            ItemClick="DownloadListView_Tapped"
+            ItemTemplate="{StaticResource downloadTemplate}"
+            ItemsSource="{Binding Source={StaticResource groupInfoCVS}}"
+            SelectionMode="None">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="ContextFlyout">
                         <Setter.Value>
                             <MenuFlyout Opening="MenuFlyout_Opening">
-                                <MenuFlyoutItem Text="Delete" Icon="Delete" Click="MenuFlyoutItem_Click"/>
+                                <MenuFlyoutItem
+                                    Click="MenuFlyoutItem_Click"
+                                    Icon="Delete"
+                                    Text="Delete" />
                             </MenuFlyout>
                         </Setter.Value>
                     </Setter>
@@ -119,7 +217,7 @@
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Key}"/>
+                            <TextBlock Text="{Binding Key}" />
                         </DataTemplate>
                     </GroupStyle.HeaderTemplate>
                 </GroupStyle>

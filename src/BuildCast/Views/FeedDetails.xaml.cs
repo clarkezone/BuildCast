@@ -24,6 +24,7 @@ using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using BuildCast.DataModel.DM2;
 
 namespace BuildCast.Views
 {
@@ -73,12 +74,13 @@ namespace BuildCast.Views
             if (connectedAnimation != null)
             {
                 // Although this should already be on the UI thread, re-dispatching it to the UI thread solves an unknown timing issue.
-                var delayTask = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                var delayTask = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
                 {
-                    var ignored = feeditems.TryStartConnectedAnimationAsync(
+                    var ignored = await feeditems.TryStartConnectedAnimationAsync(
                         connectedAnimation,
                         ViewModel.PersistedEpisode,
                         "itemImage");
+                    Debug.WriteLine(ignored);
                 });
             }
 
@@ -215,7 +217,7 @@ namespace BuildCast.Views
 
         private void ContainerItem_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-            Episode episode = feeditems.SelectedItem as Episode;
+            Episode2 episode = feeditems.SelectedItem as Episode2;
 
             // Do not try to perform an action if an item isn't selected.
             if (episode == null)
@@ -239,11 +241,11 @@ namespace BuildCast.Views
             }
         }
 
-        private void FavoriteEpisode(Episode episode) => ViewModel.FavoriteEpisode(episode);
+        private void FavoriteEpisode(Episode2 episode) => ViewModel.FavoriteEpisode(episode);
 
-        private void PlayEpisode(Episode episode) => ViewModel.PlayEpisode(episode);
+        private void PlayEpisode(Episode2 episode) => ViewModel.PlayEpisode(episode);
 
-        private void DownloadEpisode(Episode episode) => ViewModel.DownloadEpisode(episode);
+        private void DownloadEpisode(Episode2 episode) => ViewModel.DownloadEpisode(episode);
 
         private void MenuFlyout_Opening(object sender, object e)
         {
@@ -256,7 +258,7 @@ namespace BuildCast.Views
                     // Associate the particular FeedItem with the menu flyout (so the MenuFlyoutItem knows which FeedItem to act upon)
                     ListViewItem itemContainer = senderAsMenuFlyout.Target as ListViewItem;
 
-                    Episode feedItem = feeditems.ItemFromContainer(itemContainer) as Episode;
+                    Episode2 feedItem = feeditems.ItemFromContainer(itemContainer) as Episode2;
 
                     (menuFlyoutItem as MenuFlyoutItem).CommandParameter = feedItem;
                 }
@@ -265,52 +267,52 @@ namespace BuildCast.Views
 
         private void Feeditems_ItemClick(object sender, ItemClickEventArgs e)
         {
-            Episode detailsItem = e.ClickedItem as Episode;
+            Episode2 detailsItem = e.ClickedItem as Episode2;
 
             StartConnectedItemImage(detailsItem);
 
             ViewModel.GoToEpisodeDetails(detailsItem);
         }
 
-        private void StartConnectedItemImage(Episode item)
+        private void StartConnectedItemImage(Episode2 item)
         {
             var animation = feeditems.PrepareConnectedAnimation("FeedItemImage", item, "itemImage");
         }
 
         private void PlayMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            PlayEpisode((sender as MenuFlyoutItem).CommandParameter as Episode);
+            PlayEpisode((sender as MenuFlyoutItem).CommandParameter as Episode2);
         }
 
         private void PlayIconButton_Click(object sender, RoutedEventArgs e)
         {
-            PlayEpisode((sender as Button).CommandParameter as Episode);
+            PlayEpisode((sender as Button).CommandParameter as Episode2);
         }
 
         private void DownloadFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            DownloadEpisode((sender as MenuFlyoutItem).CommandParameter as Episode);
+            DownloadEpisode((sender as MenuFlyoutItem).CommandParameter as Episode2);
         }
 
         private void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
-            DownloadEpisode((sender as Button).CommandParameter as Episode);
+            DownloadEpisode((sender as Button).CommandParameter as Episode2);
         }
 
         private void FavoriteFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            FavoriteEpisode((sender as MenuFlyoutItem).CommandParameter as Episode);
+            FavoriteEpisode((sender as MenuFlyoutItem).CommandParameter as Episode2);
         }
 
         private void FavoriteButton_Click(object sender, RoutedEventArgs e)
         {
-            FavoriteEpisode((sender as Button).CommandParameter as Episode);
+            FavoriteEpisode((sender as Button).CommandParameter as Episode2);
         }
 
         // Don't do anything but close the swipe container if a non-favorite swipe action occurs.
         private void SwipeItem_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
-            if (args.SwipeControl.DataContext is Episode target)
+            if (args.SwipeControl.DataContext is Episode2 target)
             {
                 DownloadEpisode(target);
             }
@@ -319,7 +321,7 @@ namespace BuildCast.Views
         // Favorite the particular item, and then close the container.
         private void FavoriteSwipeItem_Invoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
         {
-            if (args.SwipeControl.DataContext is Episode episode)
+            if (args.SwipeControl.DataContext is Episode2 episode)
             {
                 FavoriteEpisode(episode);
             }

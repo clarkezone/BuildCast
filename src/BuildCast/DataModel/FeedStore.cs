@@ -18,6 +18,8 @@ namespace BuildCast.DataModel
     using System.Linq;
     using System.Threading.Tasks;
     using BuildCast.Helpers;
+    using BuildCast.DataModel.DM2;
+    using Realms;
 
     public class FeedStore
     {
@@ -36,27 +38,38 @@ namespace BuildCast.DataModel
             {
                 try
                 {
-                    using (var db = new LocalStorageContext())
-                    {
-                        var results2 = from eps in db.EpisodeCache
-                                       join state in db.PlaybackState
-                                       on eps.Key equals state.EpisodeKey into myJoin
-                                       from sub in myJoin.DefaultIfEmpty()
-                                       where eps.IsDownloaded == true
-                                       select new EpisodeWithState { Episode = eps, PlaybackState = sub ?? new EpisodePlaybackState() };
+                    var items = DataModelManager.RealmInstance.All<Episode2>().Where(ep2 => ep2.IsDownloaded == true);
 
-                        foreach (var item in results2)
+                    List<Episode2> notDownloaded = new List<Episode2>();
+
+                    List<string> scanList = new List<string>();
+                    List<string> updateList = new List<string>();
+
+                    foreach (var item in items)
+                    {
+                        if (item.IsDownloaded)
                         {
-                            if ((await BackgroundDownloadHelper.CheckLocalFileExistsFromUriHash(new Uri(item.Episode.Key))) == null
-                            && item.Episode.IsDownloaded)
-                            {
-                                // Item is flagged as downloaded but isn't in the local cache hence update db
-                                Debug.WriteLine($"Episode {item.Episode.Title} is flagged as downloaded but file not present");
-                                item.Episode.IsDownloaded = false;
-                            }
+                            scanList.Add(item.UriKey);
                         }
-                        await db.SaveChangesAsync();
                     }
+
+                    foreach (var item in scanList)
+                    {
+                        if (await BackgroundDownloadHelper.CheckLocalFileExistsFromUriHash(new Uri(item)) == null)
+                        {
+                            updateList.Add(item);
+                        }
+                    }
+
+                    var trans = DataModelManager.RealmInstance.WriteAsync((ss) =>
+                    {
+                        foreach (var item in updateList)
+                        {
+                            ss.All<Episode2>().Where(ep => ep.UriKey_ == item).FirstOrDefault().IsDownloaded = false;
+                        }
+                    });
+
+                    await ScanDownloads();
                 }
                 catch (Exception ex)
                 {
@@ -64,6 +77,22 @@ namespace BuildCast.DataModel
                     throw ex;
                 }
             });
+        }
+
+        private static async Task ScanDownloads()
+        {
+            var items = await BackgroundDownloadHelper.GetAllFiles();
+            var trans = DataModelManager.RealmInstance.BeginWrite();
+            foreach (var item in items)
+            {
+                var found = DataModelManager.RealmInstance.All<Episode2>().Where(ep => ep.LocalFileName == item.Name).FirstOrDefault();
+                if (found != null && found.IsDownloaded == false)
+                {
+                    found.IsDownloaded = true;
+                }
+            }
+
+            trans.Commit();
         }
 
         private static void AddFeeds()

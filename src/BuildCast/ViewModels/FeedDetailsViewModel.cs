@@ -11,13 +11,16 @@
 // ******************************************************************
 
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using BuildCast.DataModel;
+using BuildCast.DataModel.DM2;
 using BuildCast.Helpers;
 using BuildCast.Services.Navigation;
 using Windows.UI.Xaml.Navigation;
+using Realms;
 
 namespace BuildCast.ViewModels
 {
@@ -25,12 +28,27 @@ namespace BuildCast.ViewModels
     {
         private INavigationService _navService;
         private bool _loading;
+        //private FeedEpisodeSource _episodeSource;
+        private IQueryable<Episode2> _episodeSource;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Feed CurrentFeed { get; private set; }
+        public Feed2 CurrentFeed { get; private set; }
 
-        public ObservableCollection<Episode> EpisodeData { get; set; }
+        //public FeedEpisodeSource EpisodeData
+        //{
+        //    get
+        //    {
+        //        return _episodeSource;
+        //    }
+        //}
+        public IQueryable<Episode2> EpisodeData
+        {
+            get
+            {
+                return _episodeSource;
+            }
+        }
 
         public bool Loading
         {
@@ -45,7 +63,7 @@ namespace BuildCast.ViewModels
             }
         }
 
-        public Episode PersistedEpisode { get; set; }
+        public Episode2 PersistedEpisode { get; set; }
 
         public FeedDetailsViewModel(INavigationService navigationService)
         {
@@ -58,10 +76,15 @@ namespace BuildCast.ViewModels
         {
             Loading = true;
 
-            if (navigationMode != NavigationMode.Back && parameter is Feed feed)
+            if (navigationMode != NavigationMode.Back && parameter is Feed2 feed)
             {
                 CurrentFeed = feed;
-                EpisodeData = new ObservableCollection<Episode>(await feed.GetEpisodes());
+                //_episodeSource = new FeedEpisodeSource(CurrentFeed);
+                _episodeSource = CurrentFeed.Episodes.OrderByDescending(ob => ob.PublishDate);
+
+
+                var test = DataModelManager.RealmInstance.All<Episode2>().ToArray().Where(e => e.Feeds.Any(f => f == CurrentFeed)).ToList();
+
             }
 
             if (navigationMode != NavigationMode.Back)
@@ -75,46 +98,49 @@ namespace BuildCast.ViewModels
         public async Task<int> RefreshData()
         {
             var newEpisodes = await CurrentFeed.GetNewEpisodesAsync();
-            foreach (var episode in newEpisodes)
-            {
-                EpisodeData.Insert(0, episode);
-            }
+            //foreach (var episode in newEpisodes)
+            //{
+            //    CurrentFeed.Episodes.Add(episode);
+            //}
 
             return newEpisodes.Count;
         }
 
-        public void GoToEpisodeDetails(Episode detailsItem)
+        public void GoToEpisodeDetails(Episode2 detailsItem)
         {
             PersistedEpisode = detailsItem;
-            _navService.NavigateToEpisodeAsync(detailsItem);
+            _navService.NavigateToEpisodeAsync(detailsItem, CurrentFeed);
         }
 
         // TODO: Move these episode specific functions to the Episode themselves, pending further review.
-        public void PlayEpisode(Episode episode)
+        public void PlayEpisode(Episode2 episode)
         {
             _navService.NavigateToPlayerAsync(episode);
         }
 
-        public void FavoriteEpisode(Episode episode)
+        public void FavoriteEpisode(Episode2 episode)
         {
-            using (var db = new LocalStorageContext())
-            {
-                db.Favorites.Add(new Favorite(episode));
-                db.SaveChanges();
-            }
+            //TODO:fix
+            throw new Exception();
+            //using (var db = new LocalStorageContext())
+            //{
+            //    db.Favorites.Add(new Favorite(episode));
+            //    db.SaveChanges();
+            //}
         }
 
-        public void DownloadEpisode(Episode episode)
+        public void DownloadEpisode(Episode2 episode)
         {
-            var task = BackgroundDownloadHelper.Download(new Uri(episode.Key));
+            var task = BackgroundDownloadHelper.Download(new Uri(episode.UriKey));
         }
 
         public async Task RemoveTopThree()
         {
-            await CurrentFeed.RemoveTopThreeItems();
-            EpisodeData.RemoveAt(0);
-            EpisodeData.RemoveAt(0);
-            EpisodeData.RemoveAt(0);
+            //TODO:
+            //await CurrentFeed.RemoveTopThreeItems();
+            //EpisodeData.RemoveAt(0);
+            //EpisodeData.RemoveAt(0);
+            //EpisodeData.RemoveAt(0);
         }
     }
 }

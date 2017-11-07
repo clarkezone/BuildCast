@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Autofac;
 using BuildCast.DataModel;
+using BuildCast.DataModel.DM2;
 using BuildCast.ViewModels;
 using BuildCast.Views;
 using Microsoft.Toolkit.Uwp.Helpers;
@@ -68,11 +69,13 @@ namespace BuildCast.Services.Navigation
 
         public Task NavigateToSettingsAsync() => NavigateToPage<SettingsPage>();
 
-        public Task NavigateToFeedAsync(Feed feed) => NavigateToPage<FeedDetails>(feed);
+        public Task NavigateToFeedAsync(Feed2 feed) => NavigateToPage<FeedDetails>(feed);
 
-        public Task NavigateToEpisodeAsync(Episode episode) => NavigateToPage<EpisodeDetails>(episode);
+        public Task NavigateToEpisodeAsync(Episode2 episode, Feed2 feed) => NavigateToPage<EpisodeDetails>(episode); //TODO feed and episode
 
-        public Task NavigateToPlayerAsync(Episode episode) => NavigateToPage<Player>(episode);
+        public Task NavigateToEpisodeAsync(Episode2 episode) => NavigateToPage<EpisodeDetails>(episode);
+
+        public Task NavigateToPlayerAsync(Episode2 episode) => NavigateToPage<Player>(episode);
 
         public Task NavigateToPlayerAsync(DataModel.InkNote inkNote) => NavigateToPage<Player>(inkNote);
 

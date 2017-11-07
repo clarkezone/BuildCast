@@ -19,25 +19,57 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using BuildCast.Helpers;
+using Realms;
 using Windows.ApplicationModel;
 using Windows.Foundation.Collections;
 using Windows.Storage.Streams;
 using Windows.Web.Http;
 
-namespace BuildCast.DataModel
+namespace BuildCast.DataModel.DM2
 {
-    public class Feed
+    public class Feed2 : RealmObject
     {
-        public Feed(Uri feedUri, string title, string description, Uri imageUri, string author)
+        public Feed2()
         {
-            Uri = feedUri;
+
+        }
+
+        public Feed2(Uri feedUri, string title, string description, Uri imageUri, string author)
+        {
+            UriKey = feedUri;
             Title = title;
             Description = description;
             ImageUri = imageUri;
             Author = author;
         }
 
-        public Uri Uri { get; internal set; }
+        public Feed2(Feed feed)
+        {
+            UriKey = feed.Uri;
+            Title = feed.Title;
+            Description = feed.Description;
+            ImageUri = feed.ImageUri;
+            Author = feed.Author;
+        }
+
+        [Backlink(nameof(Episode2.Feeds))]
+        public IQueryable<Episode2> Episodes { get; }
+
+        [PrimaryKey]
+        public string UriKey_ { get; set; }
+
+        public Uri UriKey
+        {
+            get
+            {
+                return new Uri(UriKey_);
+            }
+
+            internal set
+            {
+                UriKey_ = value.ToString();
+            }
+        }
 
         public string Title { get; set; }
 
@@ -45,85 +77,96 @@ namespace BuildCast.DataModel
 
         public string Author { get; set; }
 
-        public Uri ImageUri { get; set; }
+        private string ImageUri_ { get; set; }
 
-        public async Task<List<Episode>> GetEpisodes()
+        public Uri ImageUri
         {
-            using (var db = new LocalStorageContext())
+            get
             {
-                var cached = db.EpisodeCache.Where(i => i.FeedId == this.Uri.ToString())
-                    .OrderByDescending(ob => ob.PublishDate);
-                if (cached.Count() > 0)
-                {
-                    foreach (var item in cached)
-                    {
-                        item.Feed = this;
-                    }
-
-                    return cached.ToList();
-                }
+                return new Uri(ImageUri_);
             }
 
-            return await GetNewEpisodesAsync();
+            internal set
+            {
+                ImageUri_ = value.ToString();
+            }
         }
 
-        internal async Task<List<Episode>> GetNewEpisodesAsync()
+        
+
+        public async Task<List<Episode2>> GetEpisodes()
         {
-            List<Episode> newEpisodes = new List<Episode>();
+            throw new NotImplementedException();
+            //using (var db = new LocalStorageContext())
+            //{
+            //    var cached = db.EpisodeCache.Where(i => i.FeedId == this.Uri.ToString())
+            //        .OrderByDescending(ob => ob.PublishDate);
+            //    if (cached.Count() > 0)
+            //    {
+            //        foreach (var item in cached)
+            //        {
+            //            item.Feed = this;
+            //        }
+
+            //        return cached.ToList();
+            //    }
+            //}
+
+            //return await GetNewEpisodesAsync();
+        }
+
+        internal async Task<List<Episode2>> GetNewEpisodesAsync()
+        {
+            var trans = DataModelManager.RealmInstance.BeginWrite();
             var results = await GetEpisodesInternalAsync();
-            using (var db = new LocalStorageContext())
+            foreach (var item in results)
             {
-                foreach (var item in results)
-                {
-                    if (db.EpisodeCache.Where(i => (i.Key == item.Key && i.Feed == item.Feed)).Count() == 0)
-                    {
-                        db.EpisodeCache.Add(item);
-                        newEpisodes.Add(item);
-                    }
-                }
-
-                db.SaveChanges();
+                item.Feeds.Add(this);
+                //this.Episodes.Add(item);
+                //Episodes.
             }
 
-            return newEpisodes;
+            trans.Commit();
+
+            return results;
         }
 
-        internal async Task RemoveTopThreeItems()
-        {
-            using (var db = new LocalStorageContext())
-            {
-                var episodes = await GetEpisodes();
-                db.EpisodeCache.Remove(episodes[0]);
-                db.EpisodeCache.Remove(episodes[1]);
-                db.EpisodeCache.Remove(episodes[2]);
-                await db.SaveChangesAsync();
-            }
-        }
+        //internal async Task RemoveTopThreeItems()
+        //{
+        //    using (var db = new LocalStorageContext())
+        //    {
+        //        var episodes = await GetEpisodes();
+        //        db.EpisodeCache.Remove(episodes[0]);
+        //        db.EpisodeCache.Remove(episodes[1]);
+        //        db.EpisodeCache.Remove(episodes[2]);
+        //        await db.SaveChangesAsync();
+        //    }
+        //}
 
-        internal async Task<List<Episode>> GetEpisodesInternalAsync()
+        internal async Task<List<Episode2>> GetEpisodesInternalAsync()
         {
-            switch (this.Uri.Scheme)
+            switch (this.UriKey.Scheme)
             {
                 case "http":
                 case "https":
                     return await GetEpisodesInternalFromWebAsync();
                 case "local":
-                    return await GetEpisodesInternalFromResAsync(this.Uri.DnsSafeHost);
+                    return await GetEpisodesInternalFromResAsync(this.UriKey.DnsSafeHost);
                 default:
                     return null;
             }
         }
 
-        internal async Task<List<Episode>> GetEpisodesInternalFromWebAsync()
+        internal async Task<List<Episode2>> GetEpisodesInternalFromWebAsync()
         {
             HttpClient client = new HttpClient();
-            using (var stream = await client.GetInputStreamAsync(this.Uri))
+            using (var stream = await client.GetInputStreamAsync(this.UriKey))
             {
                 return ParseRssFeed(stream, this);
             }
         }
 
-        internal async Task<List<Episode>> GetEpisodesInternalFromResAsync(string name)
+        internal async Task<List<Episode2>> GetEpisodesInternalFromResAsync(string name)
         {
             var file = await Package.Current.InstalledLocation.GetFileAsync($"Assets\\{name}");
 
@@ -133,9 +176,9 @@ namespace BuildCast.DataModel
             }
         }
 
-        internal static List<Episode> ParseRssFeed(IInputStream stream, Feed parent)
+        internal static List<Episode2> ParseRssFeed(IInputStream stream, Feed2 parent)
         {
-            List<Episode> results = new List<Episode>();
+            List<Episode2> results = new List<Episode2>();
 
             XNamespace ns = "http://purl.org/rss/1.0/";
             XNamespace mrss = "http://search.yahoo.com/mrss/";
@@ -237,7 +280,7 @@ namespace BuildCast.DataModel
 
                 if (mediadownload != null)
                 {
-                    var feed = new Episode(
+                    var feed = new Episode2(
                                title: item.Element("title").Value,
                                description: desc.Value,
                                key: mediadownload.Value,
@@ -260,7 +303,7 @@ namespace BuildCast.DataModel
         internal static Feed BuildFeedFromValueSet(ValueSet values)
         {
             Feed built = new Feed(
-                feedUri: values.GetURI(nameof(Uri)),
+                feedUri: values.GetURI(nameof(UriKey)),
                 title: values.GetString(nameof(Title)),
                 description: values.GetString(nameof(Description)),
                 author: values.GetString(nameof(Author)),
@@ -276,7 +319,7 @@ namespace BuildCast.DataModel
             feedvs.Add(nameof(Description), Description);
             feedvs.Add(nameof(ImageUri), ImageUri?.ToString());
             feedvs.Add(nameof(Title), Title);
-            feedvs.Add(nameof(Uri), Uri?.ToString());
+            feedvs.Add(nameof(UriKey), UriKey?.ToString());
             feedvs.Add(nameof(Author), Author);
         }
     }

@@ -12,10 +12,12 @@
 
 namespace BuildCast.ViewModels
 {
+    using System;
     using System.ComponentModel;
     using System.Linq;
     using System.Threading.Tasks;
     using BuildCast.DataModel;
+    using BuildCast.DataModel.DM2;
     using BuildCast.Services.Navigation;
     using Microsoft.Toolkit.Uwp.Helpers;
 
@@ -23,61 +25,34 @@ namespace BuildCast.ViewModels
     {
         private INavigationService _navigationService;
 
-        private IQueryable<EpisodeWithState> _downloads;
+        private IQueryable<Episode2> _downloads;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public DownloadsViewModel(INavigationService navigationService)
         {
             _navigationService = navigationService;
+            //_downloads = new ItemSource<Episode2>(DataModelManager.RealmInstance.All<Episode2>().Where(ep => ep.IsDownloaded == true).OrderByDescending(ob => ob.PublishDate));
+            _downloads = DataModelManager.RealmInstance.All<Episode2>().Where(ep => ep.IsDownloaded == true).OrderByDescending(ob => ob.PublishDate);
         }
 
-        public async void RemoveDownloadedEpisode(Episode episode)
+        public async void RemoveDownloadedEpisode(Episode2 episode)
         {
             if (episode != null)
             {
                 await episode.DeleteDownloaded();
-                await LoadDownloads();
             }
         }
 
-        public async void ReloadDownloadList()
-        {
-            await LoadDownloads();
-        }
-
-        public IQueryable<EpisodeWithState> Downloads
+        public IQueryable<Episode2> Downloads
         {
             get
             {
                 return _downloads;
             }
-
-            private set
-            {
-                if (value != _downloads)
-                {
-                    _downloads = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Downloads)));
-                }
-            }
         }
 
-        public async Task LoadDownloads()
-        {
-            await Task.Run(async () =>
-            {
-                using (var db = new LocalStorageContext())
-                {
-                    await DispatcherHelper.ExecuteOnUIThreadAsync(() =>
-                    {
-                        BuildDownloads(db);
-                    });
-                }
-            });
-        }
-
-        internal void NavigateToEpisode(Episode episode)
+        internal void NavigateToEpisode(Episode2 episode)
         {
             var ignored = _navigationService.NavigateToPlayerAsync(episode);
         }
@@ -90,18 +65,6 @@ namespace BuildCast.ViewModels
         internal void NavigateToPlayerWithInk(InkNote ink)
         {
             var ignored = _navigationService.NavigateToPlayerAsync(ink);
-        }
-
-        private void BuildDownloads(LocalStorageContext db)
-        {
-            var results2 = from eps in db.EpisodeCache
-                           join state in db.PlaybackState
-                           on eps.Key equals state.EpisodeKey into myJoin
-                           from sub in myJoin.DefaultIfEmpty()
-                           where eps.IsDownloaded == true
-                           select new EpisodeWithState { Episode = eps, PlaybackState = sub ?? new EpisodePlaybackState() };
-
-            Downloads = results2;
         }
     }
 }

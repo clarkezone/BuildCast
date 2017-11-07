@@ -27,7 +27,6 @@ namespace BuildCast.DataModel
         private DbSet<Episode> _episodeCache;
         private DbSet<InkNote> _memes;
         private DbSet<InkNoteData> _inkNotes;
-        private DbSet<EpisodePlaybackState> _playbackState;
 
         static LocalStorageContext()
         {
@@ -87,20 +86,6 @@ namespace BuildCast.DataModel
             set
             {
                 _inkNotes = value;
-            }
-        }
-
-        public DbSet<EpisodePlaybackState> PlaybackState
-        {
-            get
-            {
-                _initializer.CheckInitialized();
-                return _playbackState;
-            }
-
-            set
-            {
-                _playbackState = value;
             }
         }
 

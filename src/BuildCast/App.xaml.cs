@@ -53,6 +53,7 @@ namespace BuildCast
             this.Suspending += OnSuspending;
 
             LocalStorageContext.CheckMigrations();
+            DataModel.DM2.RealmTempPlace.CheckMigrate();
 
             this.RequiresPointerMode = ApplicationRequiresPointerMode.WhenRequested;
         }

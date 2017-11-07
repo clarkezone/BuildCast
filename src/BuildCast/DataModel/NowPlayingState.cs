@@ -13,18 +13,19 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using BuildCast.DataModel.DM2;
 
 namespace BuildCast.DataModel
 {
     public class NowPlayingState
     {
-        private static Feed _currentFeed;
-        private static Episode _currentEpisode;
+        private static Feed2 _currentFeed;
+        private static Episode2 _currentEpisode;
         private static TimeSpan _currentTime;
 
-        public Episode CurrentEpisode { get => _currentEpisode; set => _currentEpisode = value; }
+        public Episode2 CurrentEpisode { get => _currentEpisode; set => _currentEpisode = value; }
 
-        public Feed CurrentFeed { get => _currentFeed; set => _currentFeed = value; }
+        public Feed2 CurrentFeed { get => _currentFeed; set => _currentFeed = value; }
 
         public TimeSpan CurrentTime { get => _currentTime; set => _currentTime = value; }
 
@@ -38,15 +39,16 @@ namespace BuildCast.DataModel
 
         public async Task LoadStateAsync()
         {
-            await Task.Run(() =>
-            {
-                DePersistLastPlayed(out Feed feed, out Episode episode, out TimeSpan position);
-                this.CurrentFeed = feed;
-                this.CurrentEpisode = episode;
-            });
+            //TODO:
+            //await Task.Run(() =>
+            //{
+            //    DePersistLastPlayed(out Feed feed, out Episode episode, out TimeSpan position);
+            //    this.CurrentFeed = feed;
+            //    this.CurrentEpisode = episode;
+            //});
         }
 
-        public async Task<Tuple<bool, bool>> HandlePlayRequest(Episode paramItem)
+        public async Task<Tuple<bool, bool>> HandlePlayRequest(Episode2 paramItem)
         {
             var shouldSwitch = ShouldSwitch(paramItem);
 
@@ -59,8 +61,9 @@ namespace BuildCast.DataModel
 
             if (_currentFeed != null && _currentEpisode != null)
             {
-                await LoadEpisodePlaybackState();
-                PersistLastPlayed(_currentFeed, _currentEpisode, _currentTime);
+                //await LoadEpisodePlaybackState();
+                //TODO:
+                //PersistLastPlayed(_currentFeed, _currentEpisode, _currentTime);
             }
 
             return new Tuple<bool, bool>(shouldSwitch, paramItem != null);
@@ -68,38 +71,41 @@ namespace BuildCast.DataModel
 
         public bool HandlePlayRequest(InkNote paramItem)
         {
-            Episode newEpisode = null;
-            using (LocalStorageContext lsc = new LocalStorageContext())
-            {
-                newEpisode = lsc.EpisodeCache.Where(ep => ep.Key == paramItem.EpisodeKey).FirstOrDefault();
-            }
+            //TODO
+            //throw new Exception();
+            //Episode newEpisode = null;
+            //using (LocalStorageContext lsc = new LocalStorageContext())
+            //{
+            //    newEpisode = lsc.EpisodeCache.Where(ep => ep.Key == paramItem.EpisodeKey).FirstOrDefault();
+            //}
 
-            var shouldSwitch = ShouldSwitch(newEpisode);
+            //var shouldSwitch = ShouldSwitch(newEpisode);
 
-            if (shouldSwitch)
-            {
-                _currentEpisode = newEpisode;
-                _currentFeed = _currentEpisode?.Feed;
-                _currentTime = TimeSpan.Zero;
-            }
+            //if (shouldSwitch)
+            //{
+            //    _currentEpisode = newEpisode;
+            //    _currentFeed = _currentEpisode?.Feed;
+            //    _currentTime = TimeSpan.Zero;
+            //}
 
-            _currentTime = TimeSpan.FromMilliseconds(paramItem.Time);
-            if (_currentFeed != null)
-            {
-                PersistLastPlayed(_currentFeed, _currentEpisode, _currentTime);
-            }
+            //_currentTime = TimeSpan.FromMilliseconds(paramItem.Time);
+            //if (_currentFeed != null)
+            //{
+            //    PersistLastPlayed(_currentFeed, _currentEpisode, _currentTime);
+            //}
 
-            return paramItem != null;
+            //return paramItem != null;
+            return true;
         }
 
-        public bool ShouldSwitch(Episode parameter)
+        public bool ShouldSwitch(Episode2 parameter)
         {
             if (parameter == null)
             {
                 return false;
             }
 
-            if (_currentFeed == null || (_currentFeed != null && string.Compare(parameter.Key, _currentEpisode.Key, StringComparison.Ordinal) != 0))
+            if (_currentFeed == null || (_currentFeed != null && string.Compare(parameter.UriKey, _currentEpisode.UriKey, StringComparison.Ordinal) != 0))
             {
                 return true;
             }
@@ -107,7 +113,7 @@ namespace BuildCast.DataModel
             return false;
         }
 
-        public void SetNowPlaying(Feed feed, Episode feedItem, TimeSpan currenttime)
+        public void SetNowPlaying(Feed2 feed, Episode2 feedItem, TimeSpan currenttime)
         {
             _currentFeed = feed;
             _currentEpisode = feedItem;
@@ -116,65 +122,68 @@ namespace BuildCast.DataModel
 
         public async Task PeristEpisodePlaybackState()
         {
-            using (LocalStorageContext lsc = new LocalStorageContext())
-            {
-                EpisodePlaybackState state = lsc.PlaybackState.Where(i => i.EpisodeKey == _currentEpisode.Key).FirstOrDefault();
+            //throw new Exception();
+            //TODO:
+            //using (LocalStorageContext lsc = new LocalStorageContext())
+            //{
+            //    EpisodePlaybackState state = lsc.PlaybackState.Where(i => i.EpisodeKey == _currentEpisode.Key).FirstOrDefault();
 
-                if (state == null)
-                {
-                    state = new EpisodePlaybackState(this.CurrentEpisode);
-                    lsc.PlaybackState.Add(state);
-                }
-                else
-                {
-                    state.ListenProgress = this.CurrentTime.TotalMilliseconds;
-                    lsc.PlaybackState.Update(state);
-                }
+            //    if (state == null)
+            //    {
+            //        state = new EpisodePlaybackState(this.CurrentEpisode);
+            //        lsc.PlaybackState.Add(state);
+            //    }
+            //    else
+            //    {
+            //        state.ListenProgress = this.CurrentTime.TotalMilliseconds;
+            //        lsc.PlaybackState.Update(state);
+            //    }
 
-                await lsc.SaveChangesAsync();
-            }
+            //    await lsc.SaveChangesAsync();
+            //}
         }
 
         public async Task LoadEpisodePlaybackState()
         {
-            await Task.Run(async () =>
-            {
-                using (LocalStorageContext lsc = new LocalStorageContext())
-                {
-                    EpisodePlaybackState state = null;
-                    if (_currentEpisode != null)
-                    {
-                        state = lsc.PlaybackState.Where(i => i.EpisodeKey == CurrentEpisode.Key).FirstOrDefault();
+            //TODO:
+            //await Task.Run(async () =>
+            //{
+            //    using (LocalStorageContext lsc = new LocalStorageContext())
+            //    {
+            //        EpisodePlaybackState state = null;
+            //        if (_currentEpisode != null)
+            //        {
+            //            state = lsc.PlaybackState.Where(i => i.EpisodeKey == CurrentEpisode.Key).FirstOrDefault();
 
-                        if (state == null)
-                        {
-                            EpisodePlaybackState eps = new EpisodePlaybackState(CurrentEpisode);
-                            lsc.PlaybackState.Add(eps);
-                            await lsc.SaveChangesAsync();
-                        }
-                        else
-                        {
-                            CurrentTime = TimeSpan.FromMilliseconds(state.ListenProgress);
-                        }
-                    }
-                }
-            });
+            //            if (state == null)
+            //            {
+            //                EpisodePlaybackState eps = new EpisodePlaybackState(CurrentEpisode);
+            //                lsc.PlaybackState.Add(eps);
+            //                await lsc.SaveChangesAsync();
+            //            }
+            //            else
+            //            {
+            //                CurrentTime = TimeSpan.FromMilliseconds(state.ListenProgress);
+            //            }
+            //        }
+            //    }
+            //});
         }
 
-        private void PersistLastPlayed(Feed feed, Episode episode, TimeSpan timespan)
-        {
-            var settings = Windows.Storage.ApplicationData.Current.LocalSettings;
+        //private void PersistLastPlayed(Feed feed, Episode episode, TimeSpan timespan)
+        //{
+        //    var settings = Windows.Storage.ApplicationData.Current.LocalSettings;
 
-            var composite = new Windows.Storage.ApplicationDataCompositeValue();
-            composite["feedUri"] = feed.Uri.ToString();
-            composite["feedTitle"] = feed.Title;
-            composite["feedDescription"] = feed.Description;
-            composite["feedImageUri"] = feed.ImageUri.ToString();
-            composite["feedAuthor"] = feed.Author;
-            composite["episodeUri"] = episode.Key.ToString();
+        //    var composite = new Windows.Storage.ApplicationDataCompositeValue();
+        //    composite["feedUri"] = feed.Uri.ToString();
+        //    composite["feedTitle"] = feed.Title;
+        //    composite["feedDescription"] = feed.Description;
+        //    composite["feedImageUri"] = feed.ImageUri.ToString();
+        //    composite["feedAuthor"] = feed.Author;
+        //    composite["episodeUri"] = episode.Key.ToString();
 
-            settings.Values["currentState"] = composite;
-        }
+        //    settings.Values["currentState"] = composite;
+        //}
 
         private void DePersistLastPlayed(out Feed feed, out Episode episode, out TimeSpan timespan)
         {

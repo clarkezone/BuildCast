@@ -10,7 +10,7 @@
 // THE CODE OR THE USE OR OTHER DEALINGS IN THE CODE.
 // ******************************************************************
 
-using BuildCast.DataModel;
+using BuildCast.DataModel.DM2;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -24,7 +24,7 @@ namespace BuildCast.Views
 
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
-            if (item is EpisodeWithState)
+            if (item is Episode2)
             {
                 return EpisodeTemplate;
             }
