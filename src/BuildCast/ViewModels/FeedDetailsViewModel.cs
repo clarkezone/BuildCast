@@ -81,10 +81,6 @@ namespace BuildCast.ViewModels
                 CurrentFeed = feed;
                 //_episodeSource = new FeedEpisodeSource(CurrentFeed);
                 _episodeSource = CurrentFeed.Episodes.OrderByDescending(ob => ob.PublishDate);
-
-
-                var test = DataModelManager.RealmInstance.All<Episode2>().ToArray().Where(e => e.Feeds.Any(f => f == CurrentFeed)).ToList();
-
             }
 
             if (navigationMode != NavigationMode.Back)

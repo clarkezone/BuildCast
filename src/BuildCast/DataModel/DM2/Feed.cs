@@ -92,36 +92,22 @@ namespace BuildCast.DataModel.DM2
             }
         }
 
-        
-
-        public async Task<List<Episode2>> GetEpisodes()
-        {
-            throw new NotImplementedException();
-            //using (var db = new LocalStorageContext())
-            //{
-            //    var cached = db.EpisodeCache.Where(i => i.FeedId == this.Uri.ToString())
-            //        .OrderByDescending(ob => ob.PublishDate);
-            //    if (cached.Count() > 0)
-            //    {
-            //        foreach (var item in cached)
-            //        {
-            //            item.Feed = this;
-            //        }
-
-            //        return cached.ToList();
-            //    }
-            //}
-
-            //return await GetNewEpisodesAsync();
-        }
-
         internal async Task<List<Episode2>> GetNewEpisodesAsync()
         {
             var trans = DataModelManager.RealmInstance.BeginWrite();
             var results = await GetEpisodesInternalAsync();
             foreach (var item in results)
             {
-                item.Feeds.Add(this);
+                //TODO: handle the error correctly
+                try
+                {
+                    item.Feeds.Add(this);
+                    DataModelManager.RealmInstance.Add(item);
+                }
+                catch (Exception ex)
+                {
+
+                }
                 //this.Episodes.Add(item);
                 //Episodes.
             }

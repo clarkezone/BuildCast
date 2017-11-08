@@ -18,6 +18,7 @@ namespace BuildCast.DataModel.DM2
                     {
                         var feed = GetFeed(item);
                         var ep = WriteEpisode(item, feed);
+                        
                     }
 
                     trans.Commit();
@@ -36,6 +37,7 @@ namespace BuildCast.DataModel.DM2
             if (ep == null)
             {
                 ep = new Episode2(source, feed);
+                DataModelManager.RealmInstance.Add(ep);
             }
 
             return ep;
