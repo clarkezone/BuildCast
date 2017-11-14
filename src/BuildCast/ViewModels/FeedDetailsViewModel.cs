@@ -29,7 +29,7 @@ namespace BuildCast.ViewModels
         private INavigationService _navService;
         private bool _loading;
         //private FeedEpisodeSource _episodeSource;
-        private IQueryable<Episode2> _episodeSource;
+        private IRealmCollection<Episode2> _episodeSource;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -42,7 +42,7 @@ namespace BuildCast.ViewModels
         //        return _episodeSource;
         //    }
         //}
-        public IQueryable<Episode2> EpisodeData
+        public IRealmCollection<Episode2> EpisodeData
         {
             get
             {
@@ -80,7 +80,7 @@ namespace BuildCast.ViewModels
             {
                 CurrentFeed = feed;
                 //_episodeSource = new FeedEpisodeSource(CurrentFeed);
-                _episodeSource = CurrentFeed.Episodes.OrderByDescending(ob => ob.PublishDate);
+                _episodeSource = CurrentFeed.Episodes.OrderByDescending(ob => ob.PublishDate).AsRealmCollection();
             }
 
             if (navigationMode != NavigationMode.Back)
