@@ -19,7 +19,7 @@ namespace BuildCast.Services
 {
     public interface IPlayerService
     {
-        NowPlayingState NowPlaying { get; }
+        //NowPlayingState NowPlaying { get; }
 
         Task SetNewItem(Uri currentItem, TimeSpan currentTime, bool startPlayback, string localFilename);
 

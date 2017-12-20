@@ -124,6 +124,7 @@
     <Compile Include="DataModel\DM2\DataModelManager.cs" />
     <Compile Include="DataModel\DM2\Episode.cs" />
     <Compile Include="DataModel\DM2\ItemSource.cs" />
+    <Compile Include="DataModel\DM2\NowPlaying.cs" />
     <Compile Include="DataModel\DM2\PlaybackState.cs" />
     <Compile Include="DataModel\DM2\Feed.cs" />
     <Compile Include="DataModel\DM2\FeedEpisodeSource.cs" />

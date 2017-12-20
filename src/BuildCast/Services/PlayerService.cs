@@ -37,7 +37,7 @@ namespace BuildCast.Services
     {
         private static PlayerService _current;
 
-        private NowPlayingState _nowPlayingState;
+        //private NowPlayingState _nowPlayingState;
 
         private MediaPlayer _mediaPlayer;
 
@@ -260,7 +260,7 @@ namespace BuildCast.Services
             }
         }
 
-        public NowPlayingState NowPlaying { get => _nowPlayingState; }
+        //public NowPlayingState NowPlaying { get => _nowPlayingState; }
 
         public PropertySet ReferencePropertySet
         {
